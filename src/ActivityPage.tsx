@@ -25,7 +25,7 @@ const ALL_MOCK_PASSENGERS = [
 const getMockPassengers = (n: number) =>
   ALL_MOCK_PASSENGERS.slice(0, Math.min(n, ALL_MOCK_PASSENGERS.length));
 
-// ─── Trip data ────────────────────────────────────────────────────────────────
+// ─── Trip data (for testing frontend) ────────────────────────────────────────────────────────────────
 const upcomingTripsDriver: Trip[] = [
   { id: 1, title: 'University of Bath', meta: '23 Nov · 09:00', action: 'More', status: 'upcomingDriver', numberPassengers: 3 },
 ];
