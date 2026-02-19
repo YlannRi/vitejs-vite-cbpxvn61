@@ -52,18 +52,16 @@ const HomePage: React.FC = () => {
 
         <div className="top-toggle">
           <button
-            className={`toggle-tab ${
-              mode === 'user' ? 'toggle-tab-active' : ''
-            }`}
+            className={`toggle-tab ${mode === 'user' ? 'toggle-tab-active' : ''
+              }`}
             onClick={() => setMode('user')}
           >
             Rides
           </button>
           <button
-            className={`toggle-tab ${
-              mode === 'driver' ? 'toggle-tab-active' : ''
-            }`}
-            onClick={() => setMode('driver')}
+            className={`toggle-tab ${mode === 'Driver' ? 'toggle-tab-active' : ''
+              }`}
+            onClick={() => setMode('Driver')}
           >
             Driver
           </button>
