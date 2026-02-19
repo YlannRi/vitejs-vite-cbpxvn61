@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+//comment
 type ShortcutCardProps = {
   icon: 'clock' | 'plus';
   title: string;
@@ -60,7 +60,7 @@ const HomePage: React.FC = () => {
           </button>
           <button
             className={`toggle-tab ${
-              mode == 'Driver' ? 'toggle-tab-active' : ''
+              mode == 'Driver' ? 'toggle-tab-active' : ''  
             }`}
             onClick={() => setMode('Driver')}
           >
