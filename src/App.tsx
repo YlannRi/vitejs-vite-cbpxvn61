@@ -74,8 +74,8 @@ const App: React.FC = () => {
             }`}
             onClick={() => setActiveTab('services')}
           >
-            <div className="nav-icon">🧭</div>
-            <div className="nav-label">Services</div>
+            <div className="nav-icon">🗺️</div>
+            <div className="nav-label">Journey</div>
           </button>
 
           <button
