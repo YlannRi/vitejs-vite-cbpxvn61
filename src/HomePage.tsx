@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-//comment
+
 type ShortcutCardProps = {
   icon: 'clock' | 'plus';
   title: string;
@@ -41,8 +41,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ emoji, title }) => (
   </button>
 );
 
-const HomePage: React.FC = () => {
-  // 'user' = passenger side (Rides), 'driver' = driver side (Driver)
+type HomePageProps = {
+  onRequestRide: () => void;
+};
+
+const HomePage: React.FC<HomePageProps> = ({ onRequestRide }) => {
   const [mode, setMode] = useState<'user' | 'Driver'>('user');
 
   return (
@@ -70,9 +73,9 @@ const HomePage: React.FC = () => {
       </header>
 
       <div className="search-wrapper">
-        <button className="search-pill">
+        <button className="search-pill" onClick={onRequestRide}>
           <span className="search-icon">🔍</span>
-          <span className="search-text">Where to?</span>
+          <span className="search-text">Request a ride</span>
         </button>
       </div>
 

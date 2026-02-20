@@ -4,8 +4,9 @@ import HomePage from './HomePage';
 import AccountPage from './AccountPage';
 import LoginPage from './LoginPage';
 import ActivityPage from './ActivityPage';
+import RequestRidePage from './RequestRidePage';
 
-type Tab = 'home' | 'services' | 'activity' | 'account';
+type Tab = 'home' | 'services' | 'activity' | 'account' | 'request';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('home');
@@ -18,17 +19,18 @@ const App: React.FC = () => {
   const renderAuthedContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomePage />;
+        return <HomePage onRequestRide={() => setActiveTab('request')} />;
+      case 'request':
+        return <RequestRidePage />;
       case 'account':
         return <AccountPage />;
       case 'services':
         // placeholder screen for now
-        return <HomePage />;
+        return <HomePage onRequestRide={() => setActiveTab('request')} />;
       case 'activity':
         return <ActivityPage />;
-        return <HomePage />;
       default:
-        return <HomePage />;
+        return <HomePage onRequestRide={() => setActiveTab('request')} />;
     }
   };
 
