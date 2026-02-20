@@ -50,6 +50,7 @@ body {
   max-width: 480px; /* “phone” width */
   padding: 20px 16px 24px;
   margin: 0 auto;
+  text-align: center;
 }
 
 .uber-header {
