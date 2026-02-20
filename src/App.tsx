@@ -5,8 +5,9 @@ import AccountPage from './AccountPage';
 import LoginPage from './LoginPage';
 import ActivityPage from './ActivityPage';
 import RequestRidePage from './RequestRidePage';
+import PostRidePage from './PostRidePage';
 
-type Tab = 'home' | 'services' | 'activity' | 'account' | 'request';
+type Tab = 'home' | 'services' | 'activity' | 'account' | 'request' | 'post';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('home');
@@ -19,18 +20,29 @@ const App: React.FC = () => {
   const renderAuthedContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomePage onRequestRide={() => setActiveTab('request')} />;
+        return <HomePage
+                 onRequestRide={() => setActiveTab('request')}
+                 onPostRide={() => setActiveTab('post')}
+               />;
       case 'request':
         return <RequestRidePage />;
+      case 'post':
+        return <PostRidePage />; // Render the post page
       case 'account':
         return <AccountPage />;
       case 'services':
         // placeholder screen for now
-        return <HomePage onRequestRide={() => setActiveTab('request')} />;
+        return <HomePage
+                 onRequestRide={() => setActiveTab('request')}
+                 onPostRide={() => setActiveTab('post')}
+               />;
       case 'activity':
         return <ActivityPage />;
       default:
-        return <HomePage onRequestRide={() => setActiveTab('request')} />;
+        return <HomePage
+                 onRequestRide={() => setActiveTab('request')}
+                 onPostRide={() => setActiveTab('post')}
+               />;
     }
   };
 

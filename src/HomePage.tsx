@@ -43,9 +43,10 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ emoji, title }) => (
 
 type HomePageProps = {
   onRequestRide: () => void;
+  onPostRide: () => void;
 };
 
-const HomePage: React.FC<HomePageProps> = ({ onRequestRide }) => {
+const HomePage: React.FC<HomePageProps> = ({ onRequestRide, onPostRide }) => {
   const [mode, setMode] = useState<'user' | 'Driver'>('user');
 
   return (
@@ -73,13 +74,17 @@ const HomePage: React.FC<HomePageProps> = ({ onRequestRide }) => {
       </header>
 
       <div className="search-wrapper">
-        <button className="search-pill" onClick={onRequestRide}>
+        <button
+          className="search-pill"
+          onClick={mode === 'user' ? onRequestRide : onPostRide}
+        >
           <span className="search-icon">🔍</span>
-          <span className="search-text">Request a ride</span>
+          <span className="search-text">
+            {mode === 'user' ? 'Request a ride' : 'Post a ride'}
+          </span>
         </button>
       </div>
 
-      {/* Shortcuts: same for both user and rider */}
       <section className="uber-section">
         <h2 className="section-title">Shortcuts</h2>
 
