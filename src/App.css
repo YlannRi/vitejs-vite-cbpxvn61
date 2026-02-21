@@ -602,3 +602,21 @@ body {
   background: #ffffff;
   color: #000000;
 }
+
+/* Filter dropdown */
+.section-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-header-row .section-title { margin-bottom: 0; }
+.filter-container { position: relative; }
+.filter-button {
+  background: var(--bg-surface); color: var(--text-primary);
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 999px;
+  padding: 5px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.filter-dropdown {
+  position: absolute; right: 0; top: calc(100% + 6px);
+  background: var(--bg-surface); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius-md); overflow: hidden;
+  z-index: 10; min-width: 120px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.filter-option { padding: 11px 16px; font-size: 14px; color: var(--text-primary); cursor: pointer; transition: background var(--transition-fast); }
+.filter-option:hover { background: var(--bg-surface-alt); }

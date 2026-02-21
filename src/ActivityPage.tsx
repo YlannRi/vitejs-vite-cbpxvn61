@@ -1,18 +1,53 @@
+// Reason why navbar goes weird is because it has a scroll bar on the right
+// Removed RouteRow for now because it's surplus
 import React, { useState, useRef } from 'react';
 import './ActivityPage.css';
 
+// Trip type
 type Trip = {
   id: number;
-  title?: string;
+  destination?: string;
   username?: string;
   drivername?: string;
-  meta?: string;
+  time?: string;
   price?: string;
   numberPassengers?: number;
   rating?: number;
   action: 'More';
   status?: 'upcomingDriver' | 'upcomingUser' | 'requested' | 'pastUser' | 'passengerRequest' | 'pastDriver';
 };
+
+// ─── Trip data ────────────────────────────────────────────────────────────────
+const upcomingTripsDriver: Trip[] = [
+  { id: 1, destination: 'University of Bath', time: '23 Nov · 09:00', action: 'More', status: 'upcomingDriver', numberPassengers: 3 },
+];
+const upcomingTripsUser: Trip[] = [
+  { id: 1, destination: 'University of Bath', time: '23 Nov · 09:00', price: '£7.60', action: 'More', status: 'upcomingUser', drivername: 'James Miller' },
+];
+const requestedTrips: Trip[] = [
+  { id: 1, destination: 'University of Bath', time: '21 Nov · 00:17', price: '£6.60', action: 'More', status: 'requested', drivername: 'Priya Sharma' },
+];
+const passengerRequestedTrips: Trip[] = [
+  { id: 1, username: 'Emma Thompson', rating: 4.8, time: 'Today · 14:20', price: '£8.40',  action: 'More', status: 'passengerRequest', destination: 'University of Bath' },
+  { id: 2, username: 'Daniel Carter',  rating: 4.6, time: 'Today · 14:35', price: '£6.90',  action: 'More', status: 'passengerRequest', destination: 'City Centre' },
+  { id: 3, username: 'Sophie Patel',   rating: 4.9, time: 'Today · 15:10', price: '£12.75', action: 'More', status: 'passengerRequest', destination: 'Bath Spa Station' },
+  { id: 4, username: 'James Wilson',   time: 'Today · 15:25',              price: '£5.60',  action: 'More', status: 'passengerRequest', destination: 'Claverton Down' },
+  { id: 5, username: 'Aisha Rahman',   rating: 4.7, time: 'Today · 16:00', price: '£15.20', action: 'More', status: 'passengerRequest', destination: 'Keynsham' },
+];
+const pastTripsDrivers: Trip[] = [
+  { id: 1, destination: 'Second Bridge',         time: '21 Nov · 00:17', price: '£6.60', action: 'More', status: 'pastDriver', numberPassengers: 2 },
+  { id: 2, destination: 'University of Bath',    time: '13 Nov · 22:03', price: '£7.63', action: 'More', status: 'pastDriver', numberPassengers: 1 },
+  { id: 3, destination: 'University of Bath',    time: '31 Oct · 03:11', price: '£11.66', action: 'More', status: 'pastDriver', numberPassengers: 3 },
+  { id: 4, destination: 'University of Bath',    time: '21 Oct · 03:25', price: '£10.14', action: 'More', status: 'pastDriver', numberPassengers: 2 },
+  { id: 5, destination: 'University of Bath',    time: '17 Oct · 03:05', price: '£10.99', action: 'More', status: 'pastDriver', numberPassengers: 1 },
+  { id: 6, destination: 'Bristol Airport (BRS)', time: '14 Oct · 17:19', price: '£42.05', action: 'More', status: 'pastDriver', numberPassengers: 4 },
+];
+const pastTripsUsers: Trip[] = [
+  { id: 1, destination: 'Second Bridge',      time: '21 Nov · 00:17', price: '£6.60',  rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Sarah Chen' },
+  { id: 2, destination: 'University of Bath', time: '13 Nov · 22:03', price: '£7.63',  rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Tom Richards' },
+  { id: 3, destination: 'University of Bath', time: '31 Oct · 03:11', price: '£11.66', rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Priya Sharma' },
+  { id: 4, destination: 'University of Bath', time: '21 Oct · 03:25', price: '£10.14',              action: 'More', status: 'pastUser', drivername: 'Leo Barnes' },
+];
 
 // ─── Mock passenger data ──────────────────────────────────────────────────────
 const ALL_MOCK_PASSENGERS = [
@@ -24,37 +59,7 @@ const ALL_MOCK_PASSENGERS = [
 const getMockPassengers = (n: number) =>
   ALL_MOCK_PASSENGERS.slice(0, Math.min(n, ALL_MOCK_PASSENGERS.length));
 
-// ─── Trip data ────────────────────────────────────────────────────────────────
-const upcomingTripsDriver: Trip[] = [
-  { id: 1, title: 'University of Bath', meta: '23 Nov · 09:00', action: 'More', status: 'upcomingDriver', numberPassengers: 3 },
-];
-const upcomingTripsUser: Trip[] = [
-  { id: 1, title: 'University of Bath', meta: '23 Nov · 09:00', price: '£7.60', action: 'More', status: 'upcomingUser', drivername: 'James Miller' },
-];
-const requestedTrips: Trip[] = [
-  { id: 1, title: 'University of Bath', meta: '21 Nov · 00:17', price: '£6.60', action: 'More', status: 'requested', drivername: 'Priya Sharma' },
-];
-const passengerRequestedTrips: Trip[] = [
-  { id: 1, username: 'Emma Thompson', rating: 4.8, meta: 'Today · 14:20', price: '£8.40',  action: 'More', status: 'passengerRequest', title: 'University of Bath' },
-  { id: 2, username: 'Daniel Carter',  rating: 4.6, meta: 'Today · 14:35', price: '£6.90',  action: 'More', status: 'passengerRequest', title: 'City Centre' },
-  { id: 3, username: 'Sophie Patel',   rating: 4.9, meta: 'Today · 15:10', price: '£12.75', action: 'More', status: 'passengerRequest', title: 'Bath Spa Station' },
-  { id: 4, username: 'James Wilson',   meta: 'Today · 15:25',              price: '£5.60',  action: 'More', status: 'passengerRequest', title: 'Claverton Down' },
-  { id: 5, username: 'Aisha Rahman',   rating: 4.7, meta: 'Today · 16:00', price: '£15.20', action: 'More', status: 'passengerRequest', title: 'Keynsham' },
-];
-const pastTripsDrivers: Trip[] = [
-  { id: 1, title: 'Second Bridge',         meta: '21 Nov · 00:17', price: '£6.60', action: 'More', status: 'pastDriver', numberPassengers: 2 },
-  { id: 2, title: 'University of Bath',    meta: '13 Nov · 22:03', price: '£7.63', action: 'More', status: 'pastDriver', numberPassengers: 1 },
-  { id: 3, title: 'University of Bath',    meta: '31 Oct · 03:11', price: '£11.66', action: 'More', status: 'pastDriver', numberPassengers: 3 },
-  { id: 4, title: 'University of Bath',    meta: '21 Oct · 03:25', price: '£10.14', action: 'More', status: 'pastDriver', numberPassengers: 2 },
-  { id: 5, title: 'University of Bath',    meta: '17 Oct · 03:05', price: '£10.99', action: 'More', status: 'pastDriver', numberPassengers: 1 },
-  { id: 6, title: 'Bristol Airport (BRS)', meta: '14 Oct · 17:19', price: '£42.05', action: 'More', status: 'pastDriver', numberPassengers: 4 },
-];
-const pastTripsUsers: Trip[] = [
-  { id: 1, title: 'Second Bridge',      meta: '21 Nov · 00:17', price: '£6.60',  rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Sarah Chen' },
-  { id: 2, title: 'University of Bath', meta: '13 Nov · 22:03', price: '£7.63',  rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Tom Richards' },
-  { id: 3, title: 'University of Bath', meta: '31 Oct · 03:11', price: '£11.66', rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Priya Sharma' },
-  { id: 4, title: 'University of Bath', meta: '21 Oct · 03:25', price: '£10.14',              action: 'More', status: 'pastUser', drivername: 'Leo Barnes' },
-];
+
 
 // ─── SVG Icons ────────────────────────────────────────────────────────────────
 const Icons = {
@@ -290,19 +295,19 @@ const Btn: React.FC<{ cls: string; icon: React.ReactNode; label: string; small?:
   </button>
 );
 
-const RouteRow: React.FC<{ destination: string }> = ({ destination }) => (
-  <div className="sheet-route-row">
-    <div className="route-point">
-      <div className="route-dot dot-green"/>
-      <div><div className="route-label">Pick Up</div><div className="route-value">Current Location</div></div>
-    </div>
-    <div className="route-line-vert"/>
-    <div className="route-point">
-      <div className="route-dot dot-red"/>
-      <div><div className="route-label">Drop Off</div><div className="route-value">{destination}</div></div>
-    </div>
-  </div>
-);
+// const RouteRow: React.FC<{ destination: string }> = ({ destination }) => (
+//   <div className="sheet-route-row">
+//     <div className="route-point">
+//       <div className="route-dot dot-green"/>
+//       <div><div className="route-label">Pick Up</div><div className="route-value">Current Location</div></div>
+//     </div>
+//     <div className="route-line-vert"/>
+//     <div className="route-point">
+//       <div className="route-dot dot-red"/>
+//       <div><div className="route-label">Drop Off</div><div className="route-value">{destination}</div></div>
+//     </div>
+//   </div>
+// );
 
 // ─── Map Placeholder ──────────────────────────────────────────────────────────
 const MapPlaceholder: React.FC = () => (
@@ -416,11 +421,11 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       case 'upcomingUser':
         return (
           <>
-            <RouteRow destination={trip.title ?? 'Destination'}/>
+            {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
               <DetailRow label="Driver"         value={trip.drivername ?? 'Pending'}/>
-              <DetailRow label="Destination"    value={trip.title ?? '—'}/>
-              <DetailRow label="Date & Arrival" value={trip.meta ?? '—'}/>
+              <DetailRow label="Destination"    value={trip.destination ?? '—'}/>
+              <DetailRow label="Date & Arrival" value={trip.time ?? '—'}/>
               <DetailRow label="Estimated leave" value="Pending"/>
               <DetailRow label="Cost"           value={trip.price ?? '—'} valueClass="detail-price"/>
             </div>
@@ -438,11 +443,11 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       case 'requested':
         return (
           <>
-            <RouteRow destination={trip.title ?? 'Destination'}/>
+            {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
               <DetailRow label="Driver"      value={trip.drivername ?? 'Pending'}/>
-              <DetailRow label="Destination" value={trip.title ?? '—'}/>
-              <DetailRow label="Be There For" value={trip.meta ?? '—'}/>
+              <DetailRow label="Destination" value={trip.destination ?? '—'}/>
+              <DetailRow label="Be There For" value={trip.time ?? '—'}/>
               <DetailRow label="Cost"        value={trip.price ?? '—'} valueClass="detail-price"/>
             </div>
             <div className="sheet-actions">
@@ -459,11 +464,11 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       case 'pastUser':
         return (
           <>
-            <RouteRow destination={trip.title ?? 'Destination'}/>
+            {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
               <DetailRow label="Driver"       value={trip.drivername ?? '—'}/>
-              <DetailRow label="Destination"  value={trip.title ?? '—'}/>
-              <DetailRow label="Pick Up Time" value={trip.meta ?? '—'}/>
+              <DetailRow label="Destination"  value={trip.destination ?? '—'}/>
+              <DetailRow label="Pick Up Time" value={trip.time ?? '—'}/>
               <DetailRow label="Arrival Time" value="09:45"/>
               <DetailRow label="Cost"         value={trip.price ?? '—'} valueClass="detail-price"/>
               {trip.rating !== undefined && (
@@ -487,10 +492,10 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       case 'upcomingDriver':
         return (
           <>
-            <RouteRow destination={trip.title ?? 'Destination'}/>
+            {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
-              <DetailRow label="Destination"  value={trip.title ?? '—'}/>
-              <DetailRow label="Departure"    value={trip.meta ?? '—'}/>
+              <DetailRow label="Destination"  value={trip.destination ?? '—'}/>
+              <DetailRow label="Departure"    value={trip.time ?? '—'}/>
               <DetailRow label="Est. Arrival" value="~09:45"/>
             </div>
             <div className="passenger-section-label">
@@ -514,14 +519,14 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       case 'passengerRequest':
         return (
           <>
-            <RouteRow destination={trip.title ?? 'Destination'}/>
+            {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
               <DetailRow label="Passenger"   value={trip.username ?? '—'}/>
               {trip.rating !== undefined && (
                 <DetailRow label="Rating"    value={`⭐ ${trip.rating}`}/>
               )}
-              <DetailRow label="Destination" value={trip.title ?? '—'}/>
-              <DetailRow label="Drop Off By" value={trip.meta ?? '—'}/>
+              <DetailRow label="Destination" value={trip.destination ?? '—'}/>
+              <DetailRow label="Drop Off By" value={trip.time ?? '—'}/>
               <DetailRow label="Cost"        value={trip.price ?? '—'} valueClass="detail-price"/>
             </div>
             <div className="sheet-actions">
@@ -538,10 +543,10 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       case 'pastDriver':
         return (
           <>
-            <RouteRow destination={trip.title ?? 'Destination'}/>
+            {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
-              <DetailRow label="Destination" value={trip.title ?? '—'}/>
-              <DetailRow label="Departure"   value={trip.meta ?? '—'}/>
+              <DetailRow label="Destination" value={trip.destination ?? '—'}/>
+              <DetailRow label="Departure"   value={trip.time ?? '—'}/>
               <DetailRow label="Arrival"     value="~09:45"/>
             </div>
             <div className="passenger-section-label">
@@ -639,8 +644,8 @@ const TripSection: React.FC<TripSectionProps> = ({
                 <div className="trip-row-left">
                   <div className="trip-car-icon">🚗</div>
                   <div className="trip-row-text">
-                    <div className="trip-row-title">{trip.title ?? trip.username ?? 'Trip'}</div>
-                    <div className="trip-row-meta">{trip.meta}</div>
+                    <div className="trip-row-title">{trip.destination ?? trip.username ?? 'Trip'}</div>
+                    <div className="trip-row-meta">{trip.time}</div>
                     {trip.drivername && <div className="trip-row-meta">{trip.drivername}</div>}
                     {trip.username   && <div className="trip-row-meta">{trip.username}</div>}
                     {trip.numberPassengers !== undefined && <div className="trip-row-meta">Passengers: {trip.numberPassengers}</div>}
