@@ -2,103 +2,138 @@
 
 import React, { useState } from 'react';
 
-// Mock data for available rides
-const AVAILABLE_RIDES = [
-  { id: 1, driver: 'Jonah McCarthy', destination: 'University of Bath', time: '09:15', price: '£3.50', seats: 2, rating: 4.8 },
-  { id: 2, driver: 'Sam Wylie', destination: 'University of Bath', time: '09:30', price: '£2.50', seats: 1, rating: 4.5 },
-  { id: 3, driver: 'Joseph Goodyear', destination: 'University of Bath', time: '10:00', price: '£3.50', seats: 3, rating: 4.9 },
-];
+type Ride = {
+  id: number;
+  destination?: string;
+  date?: string;
+  driverName?: string;
+  price?: string;
+};
 
 const RequestRidePage: React.FC = () => {
+  const [rides, setRides] = useState<Ride[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Track if a search has been executed so we don't show the "No rides" empty state before they click search
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = () => {
-    // This should fetch data based on the inputs
+  // State for the input boxes (currently ignored in the fetch request)
+  const [destinationInput, setDestinationInput] = useState('');
+  const [timeInput, setTimeInput] = useState('');
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setError(null);
     setHasSearched(true);
+
+    try {
+      // HARDCODE TOKEN for now
+      const token = "";
+
+      // MAKE THE AUTHORIZED REQUEST
+      const response = await fetch('http://localhost:8000/account/rides/rides/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("401 Unauthorized: The hardcoded token might be expired or invalid.");
+        }
+        throw new Error(`Backend error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setRides(data);
+
+    } catch (err: unknown) {
+      console.error("Error fetching rides:", err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(String(err));
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="request-ride-page" style={{ padding: '20px', paddingBottom: '100px', overflowY: 'auto', height: '100%' }}>
-      <h2 className="uber-logo" style={{ marginBottom: '20px' }}>
-        Request a ride
-      </h2>
+    <div style={{ width: '100%' }}>
+      <header className="uber-header">
+        <h1 className="activity-title">Find a Ride</h1>
+      </header>
 
-      <div className="request-form">
-        {/* Destination Input */}
-        <div className="input-group" style={{ marginBottom: '15px' }}>
-          <label htmlFor="destination" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            Destination
-          </label>
+      {/* --- Search Form Area --- */}
+      <div className="auth-card" style={{ marginBottom: '24px' }}>
+        <div className="auth-field">
+          <label className="auth-label">Destination</label>
           <input
             type="text"
-            id="destination"
-            placeholder="Where to?"
-            style={{ width: '100%', padding: '12px', boxSizing: 'border-box', borderRadius: '8px', border: '1px solid #ccc' }}
+            className="auth-input"
+            placeholder="e.g. University of Bath"
+            value={destinationInput}
+            onChange={(e) => setDestinationInput(e.target.value)}
           />
         </div>
 
-        {/* Time of Arrival Input */}
-        <div className="input-group" style={{ marginBottom: '15px' }}>
-          <label htmlFor="timeOfArrival" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            Time of Arrival
-          </label>
+        <div className="auth-field">
+          <label className="auth-label">Time of arrival</label>
           <input
-            type="time"
-            id="timeOfArrival"
-            style={{ width: '100%', padding: '12px', boxSizing: 'border-box', borderRadius: '8px', border: '1px solid #ccc' }}
+            type="datetime-local"
+            className="auth-input"
+            value={timeInput}
+            onChange={(e) => setTimeInput(e.target.value)}
           />
         </div>
 
-        {/* Action Buttons */}
-        <div className="action-buttons" style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
-          <button
-            onClick={handleSearch}
-            style={{ flex: 1, padding: '12px', borderRadius: '8px', border: 'none', backgroundColor: '#000', color: '#fff', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Search
-          </button>
-        </div>
+        <button
+          className="auth-submit"
+          onClick={handleSearch} // This connects the button to the function
+          disabled={loading}
+          style={{ marginTop: '12px' }}
+        >
+          {loading ? 'Searching...' : 'Search Rides'}
+        </button>
       </div>
 
-      {/* Search Results */}
-      {hasSearched && (
-        <div className="search-results" style={{ marginTop: '30px' }}>
-          <h3 style={{ marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>
-            Available Rides -- Filter 
-          </h3>
-          {/* this is how you make the buttons like on the activity page (accesses App.css)*/ }
-          <div className="past-list">
-            {AVAILABLE_RIDES.map((ride) => (
-              <div key={ride.id} className="card trip-row-card">
-                <div className="trip-row-left">
-                  <div className="trip-car-icon">🚗</div>
-                  <div className="trip-row-text">
-                    <div className="trip-row-title">
-                      {ride.destination}
-                    </div>
-                    <div className="trip-row-meta">
-                      {ride.driver}
-                      <span className="trip-row-rating"> ⭐ {ride.rating}</span>
-                    </div>
-                    <div className="trip-row-meta">
-                      Arrives by {ride.time} • {ride.seats} seats left
-                    </div>
-                    <div className="trip-row-price">
-                      {ride.price}
-                    </div>
-                  </div>
-                </div>
+      {/* --- Results Area --- */}
+      {loading && <p style={{ color: 'var(--text-secondary)' }}>Searching for rides...</p>}
 
-                <button
-                  className="pill pill-solid trip-row-button"
-                  onClick={() => alert(`Requested a seat with ${ride.driver}!`)}
-                >
-                  Request
-                </button>
-              </div>
-            ))}
+      {error && <p style={{ color: '#f87171' }}>{error}</p>}
+
+      {/* Empty State (Only shows if they searched and got 0 results) */}
+      {!loading && !error && hasSearched && rides.length === 0 && (
+        <div className="card activity-upcoming-card">
+          <div>
+            <div className="activity-upcoming-title">No rides available</div>
+            <div className="activity-upcoming-subtitle">Try a different time or destination.</div>
           </div>
-          {/* Up until here, this can be copy and pasted*/}
+          <div className="activity-upcoming-icon">📭</div>
+        </div>
+      )}
+
+      {/* Populated List */}
+      {!loading && !error && hasSearched && rides.length > 0 && (
+        <div className="past-list">
+          {rides.map((ride) => (
+            <div key={ride.id} className="card trip-row-card">
+              <div className="trip-row-left">
+                <div className="trip-car-icon">🚗</div>
+                <div className="trip-row-text">
+                  <div className="trip-row-title">{ride.destination || `Ride #${ride.id}`}</div>
+                  <div className="trip-row-meta">{ride.date || 'Flexible'}</div>
+                  <div className="trip-row-meta">Driver: {ride.driverName || 'Pending'}</div>
+                  <div className="trip-row-price">{ride.price || 'TBD'}</div>
+                </div>
+              </div>
+              <button className="pill pill-solid trip-row-button">Request</button>
+            </div>
+          ))}
         </div>
       )}
     </div>
