@@ -106,3 +106,21 @@ const RequestRidePage: React.FC = () => {
 };
 
 export default RequestRidePage;
+
+
+
+// const [selectedFilter, setSelectedFilter] = useState('Cost');
+// const [filterOpen, setFilterOpen] = useState(false);
+
+// 
+//   <div className="filter-container">
+//   <button className="filter-button" onClick={() => setFilterOpen(o => !o)}>{selectedFilter} ▾</button>
+//   {filterOpen && (
+//     <div className="filter-dropdown">
+//       {['Cost', 'Rating', 'Ease'].map(opt => (
+//         <div key={opt} className="filter-option" onClick={() => { setSelectedFilter(opt); setFilterOpen(false); }}>{opt}</div>
+//       ))}
+//     </div>
+// 
+// </div>
+// )}
