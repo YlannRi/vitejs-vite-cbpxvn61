@@ -57,6 +57,8 @@ export const Btn: React.FC<{ cls: string; icon: React.ReactNode; label: string; 
   </button>
 );
 
+
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>('home');
   const [isAuthenticated, setIsAuthenticated] = useState(false);

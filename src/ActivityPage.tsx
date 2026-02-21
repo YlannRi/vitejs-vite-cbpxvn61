@@ -100,10 +100,6 @@ const getMockPassengers = (n: number) =>
 
 
 
-
-
-
-
 // ── Rating labels ──────────────────────────────────────────────
 const RATING_LABELS: Record<number, string> = { 1:'Poor', 2:'Fair', 3:'Good', 4:'Great', 5:'Excellent' };
 

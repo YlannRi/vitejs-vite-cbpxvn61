@@ -3,6 +3,7 @@ import './JourneyPage.css';
 import { MapPlaceholder } from './App';
 import { DetailRow } from './App';
 import { Icons } from './App';
+import { Btn } from './App.tsx';
 
 
 // Mock Data 
@@ -26,6 +27,10 @@ const MOCK_DRIVER_PICKUPS = [
   { id: 2, name: 'Daniel Carter',  rating: 4.6, pickupAddress: 'North Road',         cost: '£6.90', confirmed: true, code: "YIGE" },
   { id: 3, name: 'Sophie Patel',   rating: 4.9, pickupAddress: 'Widcombe Hill',       cost: '£12.75',confirmed: false, code: "YIGH" },
 ];
+
+
+
+
 
 // User Journey View
 const UserJourney: React.FC = () => {
@@ -69,6 +74,10 @@ const UserJourney: React.FC = () => {
         <button className="sheet-action-btn btn-message">
           {Icons.message} Message Driver
         </button>
+      </div>
+      <div className="journey-actions">
+        {/* BACKEND: onClick={send off direct predetermined report} */}
+      <Btn cls="btn-report" icon={Icons.report} label="Report Issue" />
       </div>
     </div>
   );
@@ -164,6 +173,7 @@ const DriverJourney: React.FC = () => {
 // Main JourneyPage 
 const JourneyPage: React.FC = () => {
   const [mode, setMode] = useState<'user' | 'driver'>('user');
+  
 
   return (
     <>
