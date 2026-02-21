@@ -89,6 +89,13 @@
   border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.15);
 }
 .passenger-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 0; }
+
+.passenger-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* ensures rating starts at same left edge as name */
+}
+
 .passenger-avatar {
   width: 44px; height: 44px; border-radius: 50%;
   background: var(--bg-surface-alt);

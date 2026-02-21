@@ -238,7 +238,8 @@ type ModalState =
   | { type: 'accept';   passengerName: string }
   | { type: 'deny';     passengerName: string }
   | { type: 'remove';   passengerName: string }
-  | { type: 'success';  icon: string; title: string; sub: string };
+  | { type: 'success';  icon: string; title: string; sub: string }
+  | { type: 'start';  title: string; body: string};
 
 
 // What comes up when driver kicks, rates etc
@@ -300,6 +301,23 @@ const Modal: React.FC<{
             onConfirm={() => succeed('🚫', 'Trip Cancelled', 'Your trip has been cancelled successfully')}
             onClose={onClose}
           />
+          ) : inner.type === 'start' ? (
+            <ConfirmUI
+              // BACKEND REQUIRED
+              // start trip:
+              //
+              // Backend must:
+              // - Update trip status
+              // - Notify driver/passengers
+              // - Prevent starting past trips
+              //
+              // After success, refetch trip lists.
+              icon="🏁" iconColor="#f87171"
+              title={inner.title} body={inner.body}
+              confirmLabel="Yes, Start" confirmCls="btn-confirm-accept"
+              onConfirm={() => succeed('🏁', 'Trip Started', 'Your trip has started successfully')}
+              onClose={onClose}
+            />
         ) : inner.type === 'accept' ? (
           <ConfirmUI
             // BACKEND REQUIRED
@@ -389,11 +407,11 @@ const PassengerCarousel: React.FC<{
       <div className="passenger-card">
         <div className="passenger-card-header">
           <div className="passenger-avatar">{p.name[0]}</div>
-          <div>
+          <div className="passenger-info">
             <div className="passenger-name">{p.name}</div>
             {p.rating !== undefined
               ? <div className="passenger-rating">⭐ {p.rating}</div>
-              : <div className="passenger-rating" style={{ color: 'var(--text-secondary)' }}>No rating yet</div>
+              : <div className="passenger-rating no-rating">No rating yet</div>
             }
           </div>
         </div>
@@ -541,6 +559,13 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
                 onClick={() => openModal({ type: 'cancel',
                   title: 'Cancel whole trip?',
                   body: 'This will cancel your trip for all passengers. Everyone will be notified.' })}/>
+            </div>
+            <div className="sheet-actions" style={{ marginTop: 12 }}>
+              {/* Backend required here to move upcoming into active */}
+              <Btn cls="btn-accept"  icon={Icons.accept}  label="Begin Ride"
+                  onClick={() => openModal({ type: 'start',
+                  title: 'Start whole trip?',
+                  body: 'This will start your trip and notify users.' })}/>
             </div>
           </>
         );

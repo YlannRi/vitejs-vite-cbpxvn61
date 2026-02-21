@@ -5,7 +5,7 @@ import { DetailRow } from './App';
 import { Icons } from './App';
 
 
-// ─── Mock Data ─────────────────────────────────────────────────
+// Mock Data 
 // BACKEND REQUIRED: Replace with real active trip data for current user
 
 const MOCK_ACTIVE_USER_TRIP = {
@@ -20,13 +20,14 @@ const MOCK_ACTIVE_USER_TRIP = {
 };
 
 // Ordered by algorithm (closest pickup first)
+// get real data
 const MOCK_DRIVER_PICKUPS = [
   { id: 1, name: 'Emma Thompson', rating: 4.8, pickupAddress: 'Claverton Down Rd', cost: '£8.40', confirmed: false, code: "YIGM" },
   { id: 2, name: 'Daniel Carter',  rating: 4.6, pickupAddress: 'North Road',         cost: '£6.90', confirmed: true, code: "YIGE" },
   { id: 3, name: 'Sophie Patel',   rating: 4.9, pickupAddress: 'Widcombe Hill',       cost: '£12.75',confirmed: false, code: "YIGH" },
 ];
 
-// ─── User Journey View ─────────────────────────────────────────
+// User Journey View
 const UserJourney: React.FC = () => {
   const trip = MOCK_ACTIVE_USER_TRIP;
 
@@ -73,7 +74,7 @@ const UserJourney: React.FC = () => {
   );
 };
 
-// ─── Driver Journey View ───────────────────────────────────────
+// Driver Journey View 
 const DriverJourney: React.FC = () => {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [confirmed, setConfirmed] = useState<Set<number>>(
@@ -143,6 +144,7 @@ const DriverJourney: React.FC = () => {
         <button className="sheet-action-btn btn-message">
           {Icons.message} Message
         </button>
+        {/* Update Live info */}
         {!isConfirmed ? (
           <button className="sheet-action-btn btn-accept journey-confirm-btn" onClick={handleConfirm}>
             {Icons.check} Confirm Pick Up
@@ -159,7 +161,7 @@ const DriverJourney: React.FC = () => {
   );
 };
 
-// ─── Main JourneyPage ──────────────────────────────────────────
+// Main JourneyPage 
 const JourneyPage: React.FC = () => {
   const [mode, setMode] = useState<'user' | 'driver'>('user');
 
