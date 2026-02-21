@@ -1,5 +1,6 @@
 // Reason why navbar goes weird is because it has a scroll bar on the right
 // Removed RouteRow for now because it's surplus
+// Ylann sorting out message button stuff
 import React, { useState, useRef } from 'react';
 import './ActivityPage.css';
 
@@ -17,7 +18,25 @@ type Trip = {
   status?: 'upcomingDriver' | 'upcomingUser' | 'requested' | 'pastUser' | 'passengerRequest' | 'pastDriver';
 };
 
-// ─── Trip data ────────────────────────────────────────────────────────────────
+
+// BACKEND REQUIRED
+// These trip arrays are currently hardcoded mock data.
+
+//
+// Should return trips filtered by:
+// - logged-in user ID
+// - role (driver / rider)
+// - status
+//
+// Must include:
+// - destination
+// - driver/passenger names
+// - price
+// - rating
+// - timestamps
+// - passenger count
+
+// ─── Trip data what i need from database ────────────────────────────────────────────────────────────────
 const upcomingTripsDriver: Trip[] = [
   { id: 1, destination: 'University of Bath', time: '23 Nov · 09:00', action: 'More', status: 'upcomingDriver', numberPassengers: 3 },
 ];
@@ -49,7 +68,21 @@ const pastTripsUsers: Trip[] = [
   { id: 4, destination: 'University of Bath', time: '21 Oct · 03:25', price: '£10.14',              action: 'More', status: 'pastUser', drivername: 'Leo Barnes' },
 ];
 
-// ─── Mock passenger data ──────────────────────────────────────────────────────
+
+// BACKEND REQUIRED
+// Replace mock passenger data with:
+//
+// Should return:
+// - passenger id
+// - name
+// - rating
+// - pickup location
+// - cost
+// - whether driver has rated them
+// - rating given for this trip
+//
+// Needed for PassengerCarousel in upcomingDriver & pastDriver trips.
+// ─── Mock passenger data what I need from database──────────────────────────────────────────────────────
 const ALL_MOCK_PASSENGERS = [
   { id: 1, name: 'Emma Thompson', rating: 4.8, pickupLocation: 'Claverton Down Rd', cost: '£8.40',  rated: false },
   { id: 2, name: 'Daniel Carter',  rating: 4.6, pickupLocation: 'North Rd',          cost: '£6.90',  rated: true, triprated: 5  },
@@ -72,30 +105,28 @@ const Icons = {
   back:    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>,
 };
 
-// ═══════════════════════════════════════════════════════════════
-// SHARED FEEDBACK MODAL
-// Used for: Rating, Cancel, Accept, Deny, Remove, Report
-// ═══════════════════════════════════════════════════════════════
-type FeedbackModalConfig =
-  | { kind: 'rating';  target: { name: string; role: 'driver' | 'passenger' } }
-  | { kind: 'report' }
-  | { kind: 'confirm'; icon: string; iconColor: string; title: string; body: string };
+
 
 // ── Rating labels ──────────────────────────────────────────────
 const RATING_LABELS: Record<number, string> = { 1:'Poor', 2:'Fair', 3:'Good', 4:'Great', 5:'Excellent' };
 
-// ── Success / info toast that auto-closes the whole sheet ──────
-const SuccessToast: React.FC<{ icon: string; title: string; sub: string }> = ({ icon, title, sub }) => (
-  <div className="rating-success">
-    <div className="rating-success-icon">{icon}</div>
-    <div className="rating-success-title">{title}</div>
-    <div className="rating-success-sub">{sub}</div>
-  </div>
-);
 
 // ── Rating UI ──────────────────────────────────────────────────
 const RatingUI: React.FC<{
   target: { name: string; role: 'driver' | 'passenger' };
+
+  // BACKEND REQUIRED
+  // When submitting a rating:
+  //
+  //
+  // Backend should:
+  // - Save rating
+  // - Update user's average rating
+  // - Mark trip as "rated"
+  // - Prevent duplicate ratings (shouldn't be an issue based on frontend design)
+  //
+  // After success, refetch trip data.
+
   onSubmit: (r: number) => void;
   onClose: () => void;
 }> = ({ target, onSubmit, onClose }) => {
@@ -139,8 +170,20 @@ const RatingUI: React.FC<{
 };
 
 // ── Report UI ──────────────────────────────────────────────────
-const ReportUI: React.FC<{ onSubmit: (text: string) => void; onClose: () => void }> = ({ onSubmit, onClose }) => {
+const ReportUI: React.FC<{ 
+
+  // BACKEND REQUIRED
+  // Send trip report:
+  //
+  //
+  // Backend should:
+  // - Store report
+  // - Link to trip + involved users? (Not necessary for video)
+
+  onSubmit: (text: string) => void; 
+  onClose: () => void }> = ({ onSubmit, onClose }) => {
   const [text, setText] = useState('');
+
   return (
     <div className="rating-modal-content">
       <div className="report-icon-wrap">
@@ -169,7 +212,7 @@ const ReportUI: React.FC<{ onSubmit: (text: string) => void; onClose: () => void
   );
 };
 
-// ── Confirm UI (cancel / accept / deny / remove) ───────────────
+// Confirm UI (sorts out cancel / accept / deny / remove)
 const ConfirmUI: React.FC<{
   icon: string; iconColor: string; title: string; body: string;
   confirmLabel: string; confirmCls: string;
@@ -188,7 +231,9 @@ const ConfirmUI: React.FC<{
   </div>
 );
 
-// ── Master modal shell ─────────────────────────────────────────
+
+
+// Master modal shell
 type ModalState =
   | { type: 'rating';   target: { name: string; role: 'driver' | 'passenger' } }
   | { type: 'report' }
@@ -198,15 +243,15 @@ type ModalState =
   | { type: 'remove';   passengerName: string }
   | { type: 'success';  icon: string; title: string; sub: string };
 
+
+// What comes up when driver kicks, rates etc
 const Modal: React.FC<{
   state: ModalState;
   onClose: () => void;
   onDone: () => void;      // close sheet + return to activity
 }> = ({ state, onClose, onDone }) => {
 
-  const showSuccess = (icon: string, title: string, sub: string, delay = 1200) => {
-    // We can't setState here (different component), so caller handles it
-  };
+
 
   const [inner, setInner] = useState<ModalState>(state);
 
@@ -232,7 +277,7 @@ const Modal: React.FC<{
         ) : inner.type === 'rating' ? (
           <RatingUI
             target={inner.target}
-            onSubmit={(r) => succeed('⭐', 'Rating Submitted!', 'Thanks for your feedback')}
+            onSubmit={() => succeed('⭐', 'Rating Submitted!', 'Thanks for your feedback')}
             onClose={onClose}
           />
         ) : inner.type === 'report' ? (
@@ -242,6 +287,16 @@ const Modal: React.FC<{
           />
         ) : inner.type === 'cancel' ? (
           <ConfirmUI
+            // BACKEND REQUIRED
+            // Cancel trip:
+            //
+            // Backend must:
+            // - Update trip status
+            // - Notify driver/passengers
+            // - Handle "refund"
+            // - Prevent cancelling past trips
+            //
+            // After success, refetch trip lists.
             icon="🚫" iconColor="#f87171"
             title={inner.title} body={inner.body}
             confirmLabel="Yes, Cancel" confirmCls="btn-confirm-cancel"
@@ -250,6 +305,15 @@ const Modal: React.FC<{
           />
         ) : inner.type === 'accept' ? (
           <ConfirmUI
+            // BACKEND REQUIRED
+            // Accept passenger request:
+            //
+            // Backend must:
+            // - Add passenger to trip
+            // - Update seat count
+            // - Change request status to upcoming
+            // - Notify passenger
+            // - Make sure valid
             icon="✅" iconColor="#4ade80"
             title={`Accept ${inner.passengerName}?`}
             body={`${inner.passengerName} will be notified that their request has been accepted.`}
@@ -259,6 +323,12 @@ const Modal: React.FC<{
           />
         ) : inner.type === 'deny' ? (
           <ConfirmUI
+            // BACKEND REQUIRED
+            // Deny passenger request:
+            //
+            // Backend must:
+            // - Update request status (remove from requested)
+            // - Notify passenger
             icon="❌" iconColor="#f87171"
             title={`Deny ${inner.passengerName}?`}
             body={`${inner.passengerName} will be notified that their request has been declined.`}
@@ -268,6 +338,14 @@ const Modal: React.FC<{
           />
         ) : inner.type === 'remove' ? (
           <ConfirmUI
+            // BACKEND REQUIRED
+            // Remove passenger from trip:
+            //
+            // Backend must:
+            // - Remove passenger
+            // - Update seat availability
+            // - Notify passenger
+            // - refund?
             icon="🗑️" iconColor="#f87171"
             title={`Remove ${inner.passengerName}?`}
             body={`${inner.passengerName} will be removed from your trip and notified.`}
@@ -281,7 +359,9 @@ const Modal: React.FC<{
   );
 };
 
-// ─── Small reusable bits ──────────────────────────────────────────────────────
+
+
+// for section under map where it shows info about the trip or user
 const DetailRow: React.FC<{ label: string; value: React.ReactNode; valueClass?: string }> = ({ label, value, valueClass }) => (
   <div className="sheet-detail-row">
     <span className="detail-label">{label}</span>
@@ -289,27 +369,17 @@ const DetailRow: React.FC<{ label: string; value: React.ReactNode; valueClass?: 
   </div>
 );
 
+
+// buttons for message, report etc
 const Btn: React.FC<{ cls: string; icon: React.ReactNode; label: string; small?: boolean; onClick?: () => void }> = ({ cls, icon, label, small, onClick }) => (
   <button className={`sheet-action-btn ${cls}${small ? ' btn-small' : ''}`} onClick={onClick}>
     {icon}{label}
   </button>
 );
 
-// const RouteRow: React.FC<{ destination: string }> = ({ destination }) => (
-//   <div className="sheet-route-row">
-//     <div className="route-point">
-//       <div className="route-dot dot-green"/>
-//       <div><div className="route-label">Pick Up</div><div className="route-value">Current Location</div></div>
-//     </div>
-//     <div className="route-line-vert"/>
-//     <div className="route-point">
-//       <div className="route-dot dot-red"/>
-//       <div><div className="route-label">Drop Off</div><div className="route-value">{destination}</div></div>
-//     </div>
-//   </div>
-// );
 
-// ─── Map Placeholder ──────────────────────────────────────────────────────────
+
+// Map Placeholder
 const MapPlaceholder: React.FC = () => (
   <div className="map-placeholder">
     <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg" className="map-svg">
@@ -329,7 +399,9 @@ const MapPlaceholder: React.FC = () => (
   </div>
 );
 
-// ─── Passenger Carousel ───────────────────────────────────────────────────────
+
+
+// Passenger Carousel - when driver views past and upcoming users at bottom 
 type Passenger = typeof ALL_MOCK_PASSENGERS[number];
 
 const PassengerCarousel: React.FC<{
@@ -394,8 +466,10 @@ const PassengerCarousel: React.FC<{
   );
 };
 
-// ─── Trip Details Panel ───────────────────────────────────────────────────────
-const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose: () => void }> = ({ trip, mode, onClose }) => {
+
+
+// Trip Details Panel - bit beneath the map when you press more
+const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose: () => void }> = ({ trip, onClose }) => {
   const [closing, setClosing] = useState(false);
   const [modal, setModal] = useState<ModalState | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -596,7 +670,9 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
   );
 };
 
-// ─── Trip Section ─────────────────────────────────────────────────────────────
+
+
+// Trip Section - What is first seen on activity page
 type TripSectionProps = {
   title: string; trips: Trip[]; emptyTitle: string; emptySubtitle: string; emptyIcon: string;
   collapsible?: boolean; mode: 'user' | 'Driver'; onTripMore: (t: Trip) => void; showFilter?: boolean;
@@ -672,7 +748,21 @@ const TripSection: React.FC<TripSectionProps> = ({
   );
 };
 
-// ─── Activity Page ────────────────────────────────────────────────────────────
+
+
+// BACKEND REQUIRED
+// On component mount:
+//
+// - Fetch all trip categories for current user
+// - Use authentication token (JWT/session)
+// - Store in state instead of mock arrays
+//
+// Also handle:
+// - Loading states
+// - Error states
+// - Refresh after actions
+
+// Putting trip sections altogether with titles
 const ActivityPage: React.FC = () => {
   const [mode, setMode] = useState<'user' | 'Driver'>('user');
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
