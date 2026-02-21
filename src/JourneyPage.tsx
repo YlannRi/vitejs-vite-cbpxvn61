@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import './JourneyPage.css';
 import { MapPlaceholder } from './App';
 import { DetailRow } from './App';
@@ -21,9 +21,9 @@ const MOCK_ACTIVE_USER_TRIP = {
 
 // Ordered by algorithm (closest pickup first)
 const MOCK_DRIVER_PICKUPS = [
-  { id: 1, name: 'Emma Thompson', rating: 4.8, pickupAddress: 'Claverton Down Rd', cost: '£8.40', confirmed: false },
-  { id: 2, name: 'Daniel Carter',  rating: 4.6, pickupAddress: 'North Road',         cost: '£6.90', confirmed: true  },
-  { id: 3, name: 'Sophie Patel',   rating: 4.9, pickupAddress: 'Widcombe Hill',       cost: '£12.75',confirmed: false },
+  { id: 1, name: 'Emma Thompson', rating: 4.8, pickupAddress: 'Claverton Down Rd', cost: '£8.40', confirmed: false, code: "YIGM" },
+  { id: 2, name: 'Daniel Carter',  rating: 4.6, pickupAddress: 'North Road',         cost: '£6.90', confirmed: true, code: "YIGE" },
+  { id: 3, name: 'Sophie Patel',   rating: 4.9, pickupAddress: 'Widcombe Hill',       cost: '£12.75',confirmed: false, code: "YIGH" },
 ];
 
 // ─── User Journey View ─────────────────────────────────────────
@@ -83,22 +83,19 @@ const DriverJourney: React.FC = () => {
   const passengers = MOCK_DRIVER_PICKUPS;
   const current = passengers[currentIdx];
   const isConfirmed = confirmed.has(current.id);
-  const isLast = currentIdx === passengers.length - 1;
+
 
   const handleConfirm = () => {
     setConfirmed(prev => new Set([...prev, current.id]));
   };
 
-  const handleNext = () => {
-    if (!isLast) setCurrentIdx(i => i + 1);
-  };
 
   return (
     <div className="journey-content">
       {/* Header */}
       <div className="journey-driver-mode-header">
-        <div className="journey-mode-title">Pick Up Orders</div>
-        <div className="journey-mode-sub">Reordered by algorithm</div>
+        <div className="journey-mode-sub">Pick Up Order</div>
+
       </div>
 
       {/* Passenger tabs */}
@@ -122,13 +119,13 @@ const DriverJourney: React.FC = () => {
       <div className="journey-passenger-card">
         <div className="journey-passenger-header">
           <div className="journey-passenger-avatar">{current.name[0]}</div>
-          <div>
+          <div className="journey-passenger-info">
             <div className="journey-passenger-name">{current.name}</div>
             {current.rating !== undefined
-              ? <div className="journey-passenger-rating">⭐ {current.rating}</div>
-              : <div className="journey-passenger-rating no-rating">No rating yet</div>
+                ? <div className="journey-passenger-rating">⭐ {current.rating}</div>
+                : <div className="journey-passenger-rating no-rating">No rating yet</div>
             }
-          </div>
+            </div>
           {isConfirmed && (
             <div className="journey-confirmed-badge">Picked Up ✓</div>
           )}
@@ -137,6 +134,7 @@ const DriverJourney: React.FC = () => {
         <div className="sheet-details-card journey-passenger-details">
           <DetailRow label="Pick Up Address" value={<><span className="detail-pin">{Icons.pin}</span>{current.pickupAddress}</>} />
           <DetailRow label="Cost"            value={current.cost} valueClass="detail-price" />
+          <DetailRow label="Code"            value={current.code} valueClass="detail-value" />
         </div>
       </div>
 
@@ -156,21 +154,7 @@ const DriverJourney: React.FC = () => {
         )}
       </div>
 
-      {/* Next button */}
-      {!isLast && (
-        <div className="journey-next-row">
-          <button className="journey-next-btn" onClick={handleNext}>
-            Next {Icons.next}
-          </button>
-        </div>
-      )}
-      {isLast && (
-        <div className="journey-next-row">
-          <div className="journey-all-done">
-            {confirmed.size === passengers.length ? '🎉 All passengers picked up!' : `${confirmed.size} / ${passengers.length} picked up`}
-          </div>
-        </div>
-      )}
+
     </div>
   );
 };

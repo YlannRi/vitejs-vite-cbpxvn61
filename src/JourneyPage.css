@@ -133,6 +133,7 @@
     display: flex;
     gap: 6px;
     margin-bottom: 14px;
+    justify-content: center;
     flex-wrap: wrap;
   }
   
@@ -176,6 +177,12 @@
     flex-shrink: 0;
     border: 2px solid rgba(255, 255, 255, 0.12);
   }
+
+  .journey-passenger-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
   
   .journey-passenger-name {
     font-size: 16px;
@@ -187,6 +194,7 @@
     font-size: 13px;
     color: var(--text-secondary);
     margin-top: 2px;
+    justify-content: left;
   }
   
   .journey-passenger-rating.no-rating {

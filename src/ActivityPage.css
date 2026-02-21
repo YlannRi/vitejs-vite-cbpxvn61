@@ -234,8 +234,7 @@
 .btn-confirm-accept { background: #22c55e !important; color: #fff !important; }
 .btn-confirm-accept:active { opacity: 0.85; }
 
-/* ── Success state ────────────────────────────────────────────── */
-.rating-modal-submitted { }
+
 
 .rating-success {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
