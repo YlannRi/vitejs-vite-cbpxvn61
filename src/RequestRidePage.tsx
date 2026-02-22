@@ -28,8 +28,13 @@ const RequestRidePage: React.FC = () => {
     setHasSearched(true);
 
     try {
-      // HARDCODE TOKEN for now
-      const token = "";
+      // Get the token from LocalStorage
+      const token = localStorage.getItem('authToken');
+
+      // Safety check in case it's missing
+      if (!token) {
+        throw new Error("No authentication token found. Please log in again.");
+      }
 
       // MAKE THE AUTHORIZED REQUEST
       const response = await fetch('http://localhost:8000/account/rides/rides/', {
