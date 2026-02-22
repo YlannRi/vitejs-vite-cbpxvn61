@@ -67,6 +67,12 @@ const App: React.FC = () => {
     setIsAuthenticated(true);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('authToken'); // Clear the token
+    setIsAuthenticated(false);            // Reset auth state
+    setActiveTab('home');                 // Reset tab so it defaults to home on next login
+  };
+
   const renderAuthedContent = () => {
     switch (activeTab) {
       case 'home':
@@ -77,11 +83,11 @@ const App: React.FC = () => {
       case 'request':
         return <RequestRidePage />;
       case 'post':
-        return <PostRidePage />; // Render the post page
+        return <PostRidePage />;
       case 'account':
-        return <AccountPage />;
+        // Pass the handler to the AccountPage
+        return <AccountPage onLogout={handleLogout} />;
       case 'journey':
-        // placeholder screen for now
         return <JourneyPage />;
       case 'activity':
         return <ActivityPage />;

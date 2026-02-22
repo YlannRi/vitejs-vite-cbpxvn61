@@ -4,14 +4,16 @@ type QuickActionCardProps = {
   emoji: string;
   label: string;
   hasDot?: boolean;
+  onClick?: () => void;
 };
 
 const QuickActionCard: React.FC<QuickActionCardProps> = ({
   emoji,
   label,
   hasDot = false,
+  onClick,
 }) => (
-  <button className="card quick-card">
+  <button className="card quick-card" onClick={onClick}>
     <div className="card-icon small-icon">
       <span className="icon-glyph">{emoji}</span>
     </div>
@@ -36,7 +38,34 @@ const InfoCard: React.FC<InfoCardProps> = ({ title, subtitle, right }) => (
   </div>
 );
 
-const AccountPage: React.FC = () => {
+type AccountPageProps = {
+  onLogout: () => void;
+};
+
+const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
+
+  const handleLogoutClick = async () => {
+    const token = localStorage.getItem('authToken');
+
+    if (token) {
+      try {
+        await fetch('http://localhost:8000/account/auth/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        // We don't necessarily need to await a JSON response for a logout,
+        // as long as the request was sent successfully to invalidate the session.
+      } catch (error) {
+        console.error("Error communicating with logout endpoint:", error);
+      }
+    }
+
+    // Always log the user out on the frontend side, even if the backend call fails
+    onLogout();
+  };
+
   return (
     <>
       <header className="account-header">
@@ -47,8 +76,8 @@ const AccountPage: React.FC = () => {
       </header>
 
       <div className="quick-actions-grid">
-        <QuickActionCard emoji="⚙" label="Help" />
-        <QuickActionCard emoji="➜" label="Logout" />
+        <QuickActionCard emoji="⚙" label="Settings" />
+        <QuickActionCard emoji="➜" label="Logout" onClick={handleLogoutClick} />
         <QuickActionCard emoji="🛡" label="Safety" />
         <QuickActionCard emoji="✉" label="Inbox" hasDot />
       </div>
@@ -68,16 +97,6 @@ const AccountPage: React.FC = () => {
           </div>
         }
       />
-
-      <div className="card info-card">
-        <div className="info-card-main">
-          <div className="info-card-title">Estimated CO₂ saved</div>
-        </div>
-        <div className="info-card-right co2-right">
-          <span className="co2-leaf">🌱</span>
-          <span className="co2-value">940 g</span>
-        </div>
-      </div>
     </>
   );
 };
