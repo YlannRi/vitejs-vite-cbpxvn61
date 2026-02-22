@@ -44,8 +44,8 @@ type AccountPageProps = {
 
 const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
   const [userName, setUserName] = useState<string>('Loading...');
+  const [rating, setRating] = useState<number | string>('...');
 
-  // Fetch the profile data when the page loads
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem('authToken');
@@ -61,18 +61,25 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
 
         if (response.ok) {
           const data = await response.json();
-          // Supabase returns an array for select() queries
           if (data && data.length > 0) {
             const profile = data[0];
+
             const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
             setUserName(fullName || profile.university_username || 'University Student');
+
+            const userRating = profile.rider_rating !== null && profile.rider_rating !== undefined
+              ? Number(profile.rider_rating).toFixed(2)
+              : 'New';
+            setRating(userRating);
           }
         } else {
           setUserName('Unknown User');
+          setRating('N/A');
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
         setUserName('Unknown User');
+        setRating('N/A');
       }
     };
 
@@ -103,7 +110,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
       <header className="account-header">
         <div>
           <div className="account-name">{userName}</div>
-          <div className="rating-badge">★ 4.33</div>
+          <div className="rating-badge">★ {rating}</div>
         </div>
       </header>
 
