@@ -270,6 +270,10 @@ body {
   margin-bottom: 18px;
 }
 
+.quick-actions-grid .card {
+  margin-top: 0;
+}
+
 .quick-card {
   display: flex;
   align-items: center;
