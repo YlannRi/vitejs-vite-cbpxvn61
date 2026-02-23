@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from 'react';
+import React, {type CSSProperties, useEffect, useState} from 'react';
 
 type QuickActionCardProps = {
   emoji: string;
   label: string;
   hasDot?: boolean;
   onClick?: () => void;
+  style?: CSSProperties;
 };
 
 const QuickActionCard: React.FC<QuickActionCardProps> = ({
@@ -12,8 +13,9 @@ const QuickActionCard: React.FC<QuickActionCardProps> = ({
   label,
   hasDot = false,
   onClick,
+  style,
 }) => (
-  <button className="card quick-card" onClick={onClick}>
+  <button className="card quick-card" onClick={onClick} style={style}>
     <div className="card-icon small-icon">
       <span className="icon-glyph">{emoji}</span>
     </div>
@@ -120,7 +122,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
       <div className="quick-actions-grid">
         <QuickActionCard emoji="⚙" label="Settings" />
         <QuickActionCard emoji="➜" label="Logout" onClick={handleLogoutClick} />
-        <QuickActionCard emoji="🛡" label="Safety" />
+        <QuickActionCard emoji="⚠️" label="Safety Alarm" style={{ color: '#ff5555' }} />
         <QuickActionCard emoji="✉" label="Inbox" hasDot />
       </div>
 
