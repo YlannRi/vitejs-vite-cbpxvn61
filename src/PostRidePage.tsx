@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useGeocode } from './components/Map/useGeocode';
 
 const PostRidePage: React.FC = () => {
   // Form State
@@ -12,6 +13,7 @@ const PostRidePage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const { geocodeAddress } = useGeocode();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +28,31 @@ const PostRidePage: React.FC = () => {
         throw new Error("No authentication token found. Please log in again.");
       }
 
-      // 2. Construct the payload for the JSON body
+      // 2. Geocode the origin and destination
+      const [originResults, destResults] = await Promise.all([
+        geocodeAddress(origin),
+        geocodeAddress(destination)
+      ]);
+
+      if (originResults.length === 0) {
+        throw new Error("Could not find coordinates for the origin address.");
+      }
+      if (destResults.length === 0) {
+        throw new Error("Could not find coordinates for the destination address.");
+      }
+
+      const originCoords = originResults[0];
+      const destCoords = destResults[0];
+
+      // 3. Construct the payload for the JSON body
       // We map these exactly to the Pydantic RideCreate model on your backend
       const payload = {
         origin: origin,
         destination: destination,
+        origin_lat: originCoords.lat,
+        origin_lng: originCoords.lng,
+        destination_lat: destCoords.lat,
+        destination_lng: destCoords.lng,
         departure_time: new Date(timeInput).toISOString(),
         seats_total: parseInt(seats, 10),
       };
@@ -62,7 +84,7 @@ const PostRidePage: React.FC = () => {
         }
 
         if (response.status === 403) {
-           errorMessage = "403 Forbidden: You must be a verified driver to post a ride.";
+          errorMessage = "403 Forbidden: You must be a verified driver to post a ride.";
         }
 
         throw new Error(errorMessage);
