@@ -244,6 +244,13 @@ body {
   font-weight: 700;
 }
 
+.account-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
 .rating-badge {
   display: inline-flex;
   align-items: center;
