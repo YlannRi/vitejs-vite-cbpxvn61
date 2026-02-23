@@ -1,4 +1,4 @@
-import React, {type CSSProperties, useEffect, useState} from 'react';
+import React, { type CSSProperties, useEffect, useState } from 'react';
 
 type QuickActionCardProps = {
   emoji: string;
