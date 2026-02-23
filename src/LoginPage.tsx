@@ -22,8 +22,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onAuthSuccess }) => {
     setLoading(true);
 
     const endpoint = mode === 'login'
-      ? 'http://localhost:8000/account/auth/auth/login'
-      : 'http://localhost:8000/account/auth/auth/register';
+      ? 'https://localhost:8000/account/auth/auth/login'
+      : 'https://localhost:8000/account/auth/auth/register';
 
     // Both Login and Register now send standard JSON
     const payload = mode === 'login'

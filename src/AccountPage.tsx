@@ -54,7 +54,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
       if (!token) return;
 
       try {
-        const response = await fetch('http://localhost:8000/account/users/users/me', {
+        const response = await fetch('https://localhost:8000/account/users/users/me', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -96,7 +96,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
 
     if (token) {
       try {
-        await fetch('http://localhost:8000/account/auth/auth/logout', {
+        await fetch('https://localhost:8000/account/auth/auth/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`

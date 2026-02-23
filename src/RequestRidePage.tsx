@@ -37,7 +37,7 @@ const RequestRidePage: React.FC = () => {
       }
 
       // MAKE THE AUTHORIZED REQUEST
-      const response = await fetch('http://localhost:8000/account/rides/rides/', {
+      const response = await fetch('https://localhost:8000/account/rides/rides/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

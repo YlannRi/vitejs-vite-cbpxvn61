@@ -36,7 +36,7 @@ const PostRidePage: React.FC = () => {
       };
 
       // 3. Make the authorized POST request
-      const response = await fetch('http://localhost:8000/account/rides/rides/', {
+      const response = await fetch('https://localhost:8000/account/rides/rides/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
