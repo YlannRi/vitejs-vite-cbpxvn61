@@ -7,10 +7,12 @@ import { MapPlaceholder } from './App.tsx'
 import { DetailRow } from './App.tsx'
 import { Icons } from './App.tsx'
 import { Btn } from './App.tsx'
+import { RideRenderMap } from './components/Map/RideRenderMap';
 
 // Trip type
 type Trip = {
   id: number;
+  ride_id?: number;
   destination?: string;
   username?: string;
   drivername?: string;
@@ -19,9 +21,12 @@ type Trip = {
   numberPassengers?: number;
   rating?: number;
   action: 'More';
-  status?: 'upcomingDriver' | 'upcomingUser' | 'requested' | 'pastUser' | 'passengerRequest' | 'pastDriver' | 'activeUser' | 'activeDriver';
+  status?: 'upcomingDriver' | 'upcomingUser' | 'requested' | 'pastUser' | 'passengerRequest' | 'pastDriver' | 'activeUser' | 'activeDriver' | 'cancelled';
   numberplate?: string;
   model?: string;
+  pickup_lat?: number;
+  pickup_lng?: number;
+  passengers?: any[];
 };
 
 
@@ -43,36 +48,8 @@ type Trip = {
 // - passenger count
 
 // ─── Trip data what i need from database ────────────────────────────────────────────────────────────────
-const upcomingTripsDriver: Trip[] = [
-  { id: 1, destination: 'University of Bath', time: '23 Nov · 09:00', action: 'More', status: 'upcomingDriver', numberPassengers: 3 },
-];
-const upcomingTripsUser: Trip[] = [
-  { id: 1, destination: 'University of Bath', time: '23 Nov · 09:00', price: '£7.60', action: 'More', status: 'upcomingUser', drivername: 'James Miller' },
-];
-const requestedTrips: Trip[] = [
-  { id: 1, destination: 'University of Bath', time: '21 Nov · 00:17', price: '£6.60', action: 'More', status: 'requested', drivername: 'Priya Sharma' },
-];
-const passengerRequestedTrips: Trip[] = [
-  { id: 1, username: 'Emma Thompson', rating: 4.8, time: 'Today · 14:20', price: '£8.40',  action: 'More', status: 'passengerRequest', destination: 'University of Bath' },
-  { id: 2, username: 'Daniel Carter',  rating: 4.6, time: 'Today · 14:35', price: '£6.90',  action: 'More', status: 'passengerRequest', destination: 'City Centre' },
-  { id: 3, username: 'Sophie Patel',   rating: 4.9, time: 'Today · 15:10', price: '£12.75', action: 'More', status: 'passengerRequest', destination: 'Bath Spa Station' },
-  { id: 4, username: 'James Wilson',   time: 'Today · 15:25',              price: '£5.60',  action: 'More', status: 'passengerRequest', destination: 'Claverton Down' },
-  { id: 5, username: 'Aisha Rahman',   rating: 4.7, time: 'Today · 16:00', price: '£15.20', action: 'More', status: 'passengerRequest', destination: 'Keynsham' },
-];
-const pastTripsDrivers: Trip[] = [
-  { id: 1, destination: 'Second Bridge',         time: '21 Nov · 00:17', price: '£6.60', action: 'More', status: 'pastDriver', numberPassengers: 2 },
-  { id: 2, destination: 'University of Bath',    time: '13 Nov · 22:03', price: '£7.63', action: 'More', status: 'pastDriver', numberPassengers: 1 },
-  { id: 3, destination: 'University of Bath',    time: '31 Oct · 03:11', price: '£11.66', action: 'More', status: 'pastDriver', numberPassengers: 3 },
-  { id: 4, destination: 'University of Bath',    time: '21 Oct · 03:25', price: '£10.14', action: 'More', status: 'pastDriver', numberPassengers: 2 },
-  { id: 5, destination: 'University of Bath',    time: '17 Oct · 03:05', price: '£10.99', action: 'More', status: 'pastDriver', numberPassengers: 1 },
-  { id: 6, destination: 'Bristol Airport (BRS)', time: '14 Oct · 17:19', price: '£42.05', action: 'More', status: 'pastDriver', numberPassengers: 4 },
-];
-const pastTripsUsers: Trip[] = [
-  { id: 1, destination: 'Second Bridge',      time: '21 Nov · 00:17', price: '£6.60',  rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Sarah Chen' },
-  { id: 2, destination: 'University of Bath', time: '13 Nov · 22:03', price: '£7.63',  rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Tom Richards' },
-  { id: 3, destination: 'University of Bath', time: '31 Oct · 03:11', price: '£11.66', rating: 4.5, action: 'More', status: 'pastUser', drivername: 'Priya Sharma' },
-  { id: 4, destination: 'University of Bath', time: '21 Oct · 03:25', price: '£10.14',              action: 'More', status: 'pastUser', drivername: 'Leo Barnes' },
-];
+// Removed old mock arrays
+
 
 
 // BACKEND REQUIRED
@@ -88,20 +65,13 @@ const pastTripsUsers: Trip[] = [
 // - rating given for this trip
 //
 // Needed for PassengerCarousel in upcomingDriver & pastDriver trips.
-// ─── Mock passenger data what I need from database──────────────────────────────────────────────────────
-const ALL_MOCK_PASSENGERS = [
-  { id: 1, name: 'Emma Thompson', rating: 4.8, pickupLocation: 'Claverton Down Rd', cost: '£8.40',  rated: false },
-  { id: 2, name: 'Daniel Carter',  rating: 4.6, pickupLocation: 'North Rd',          cost: '£6.90',  rated: true, triprated: 5  },
-  { id: 3, name: 'Sophie Patel',   rating: 4.9, pickupLocation: 'Widcombe Hill',      cost: '£12.75', rated: false },
-  { id: 4, name: 'James Wilson',   rating: undefined, pickupLocation: 'Bathwick St',  cost: '£5.60',  rated: false },
-];
-const getMockPassengers = (n: number) =>
-  ALL_MOCK_PASSENGERS.slice(0, Math.min(n, ALL_MOCK_PASSENGERS.length));
+// Removed mock passenger functions
+
 
 
 
 // ── Rating labels ──────────────────────────────────────────────
-const RATING_LABELS: Record<number, string> = { 1:'Poor', 2:'Fair', 3:'Good', 4:'Great', 5:'Excellent' };
+const RATING_LABELS: Record<number, string> = { 1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Great', 5: 'Excellent' };
 
 
 // ── Rating UI ──────────────────────────────────────────────────
@@ -135,7 +105,7 @@ const RatingUI: React.FC<{
         <span className="rating-name">{target.name}</span>
       </div>
       <div className="rating-stars">
-        {[1,2,3,4,5].map(n => (
+        {[1, 2, 3, 4, 5].map(n => (
           <button key={n}
             className={`rating-star${n <= display ? ' rating-star-filled' : ''}`}
             onMouseEnter={() => setHovered(n)} onMouseLeave={() => setHovered(0)}
@@ -143,7 +113,7 @@ const RatingUI: React.FC<{
           >
             <svg width="40" height="40" viewBox="0 0 24 24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
               fill={n <= display ? '#fbbf24' : 'none'} stroke={n <= display ? '#fbbf24' : 'rgba(255,255,255,0.25)'}>
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
           </button>
         ))}
@@ -163,7 +133,7 @@ const RatingUI: React.FC<{
 };
 
 // ── Report UI ──────────────────────────────────────────────────
-const ReportUI: React.FC<{ 
+const ReportUI: React.FC<{
 
   // BACKEND REQUIRED
   // Send trip report:
@@ -173,16 +143,17 @@ const ReportUI: React.FC<{
   // - Store report
   // - Link to trip + involved users? (Not necessary for video)
 
-  onSubmit: (text: string) => void; 
-  onClose: () => void }> = ({ onSubmit, onClose }) => {
+  onSubmit: (text: string) => void;
+  onClose: () => void
+}> = ({ onSubmit, onClose }) => {
   const [text, setText] = useState('');
 
   return (
     <div className="rating-modal-content">
       <div className="report-icon-wrap">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+          <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </div>
       <div className="rating-title">Report an Issue</div>
@@ -228,14 +199,14 @@ const ConfirmUI: React.FC<{
 
 // Master modal shell
 type ModalState =
-  | { type: 'rating';   target: { name: string; role: 'driver' | 'passenger' } }
+  | { type: 'rating'; target: { name: string; role: 'driver' | 'passenger' } }
   | { type: 'report' }
-  | { type: 'cancel';   title: string; body: string }
-  | { type: 'accept';   passengerName: string }
-  | { type: 'deny';     passengerName: string }
-  | { type: 'remove';   passengerName: string }
-  | { type: 'success';  icon: string; title: string; sub: string }
-  | { type: 'start';  title: string; body: string};
+  | { type: 'cancel'; title: string; body: string }
+  | { type: 'accept'; passengerName: string }
+  | { type: 'deny'; passengerName: string }
+  | { type: 'remove'; passengerName: string }
+  | { type: 'success'; icon: string; title: string; sub: string }
+  | { type: 'start'; title: string; body: string };
 
 
 // What comes up when driver kicks, rates etc
@@ -243,7 +214,8 @@ const Modal: React.FC<{
   state: ModalState;
   onClose: () => void;
   onDone: () => void;      // close sheet + return to activity
-}> = ({ state, onClose, onDone }) => {
+  onConfirmAction?: () => Promise<boolean>;
+}> = ({ state, onClose, onDone, onConfirmAction }) => {
 
 
 
@@ -258,9 +230,9 @@ const Modal: React.FC<{
 
   return (
     <>
-      <div className="rating-modal-overlay" onClick={isSuccess ? undefined : onClose}/>
+      <div className="rating-modal-overlay" onClick={isSuccess ? undefined : onClose} />
       <div className={`rating-modal${isSuccess ? ' rating-modal-submitted' : ''}`}>
-        <div className="rating-modal-handle-area"><div className="sheet-handle"/></div>
+        <div className="rating-modal-handle-area"><div className="sheet-handle" /></div>
 
         {isSuccess && inner.type === 'success' ? (
           <div className="rating-success">
@@ -297,23 +269,23 @@ const Modal: React.FC<{
             onConfirm={() => succeed('🚫', 'Trip Cancelled', 'Your trip has been cancelled successfully')}
             onClose={onClose}
           />
-          ) : inner.type === 'start' ? (
-            <ConfirmUI
-              // BACKEND REQUIRED
-              // start trip:
-              //
-              // Backend must:
-              // - Update trip status
-              // - Notify driver/passengers
-              // - Prevent starting past trips
-              //
-              // After success, refetch trip lists.
-              icon="🏁" iconColor="#f87171"
-              title={inner.title} body={inner.body}
-              confirmLabel="Yes, Start" confirmCls="btn-confirm-accept"
-              onConfirm={() => succeed('🏁', 'Trip Started', 'Your trip has started successfully')}
-              onClose={onClose}
-            />
+        ) : inner.type === 'start' ? (
+          <ConfirmUI
+            // BACKEND REQUIRED
+            // start trip:
+            //
+            // Backend must:
+            // - Update trip status
+            // - Notify driver/passengers
+            // - Prevent starting past trips
+            //
+            // After success, refetch trip lists.
+            icon="🏁" iconColor="#f87171"
+            title={inner.title} body={inner.body}
+            confirmLabel="Yes, Start" confirmCls="btn-confirm-accept"
+            onConfirm={() => succeed('🏁', 'Trip Started', 'Your trip has started successfully')}
+            onClose={onClose}
+          />
         ) : inner.type === 'accept' ? (
           <ConfirmUI
             // BACKEND REQUIRED
@@ -329,7 +301,13 @@ const Modal: React.FC<{
             title={`Accept ${inner.passengerName}?`}
             body={`${inner.passengerName} will be notified that their request has been accepted.`}
             confirmLabel="Accept Request" confirmCls="btn-confirm-accept"
-            onConfirm={() => succeed('✅', 'Request Accepted!', `${inner.passengerName} has been added to your trip`)}
+            onConfirm={async () => {
+              if (onConfirmAction) {
+                const ok = await onConfirmAction();
+                if (!ok) return;
+              }
+              succeed('✅', 'Request Accepted!', `${inner.passengerName} has been added to your trip`);
+            }}
             onClose={onClose}
           />
         ) : inner.type === 'deny' ? (
@@ -344,7 +322,13 @@ const Modal: React.FC<{
             title={`Deny ${inner.passengerName}?`}
             body={`${inner.passengerName} will be notified that their request has been declined.`}
             confirmLabel="Deny Request" confirmCls="btn-confirm-cancel"
-            onConfirm={() => succeed('❌', 'Request Denied', `${inner.passengerName}'s request has been declined`)}
+            onConfirm={async () => {
+              if (onConfirmAction) {
+                const ok = await onConfirmAction();
+                if (!ok) return;
+              }
+              succeed('❌', 'Request Denied', `${inner.passengerName}'s request has been declined`);
+            }}
             onClose={onClose}
           />
         ) : inner.type === 'remove' ? (
@@ -374,7 +358,15 @@ const Modal: React.FC<{
 
 
 // Passenger Carousel - when driver views past and upcoming users at bottom 
-type Passenger = typeof ALL_MOCK_PASSENGERS[number];
+type Passenger = {
+  id: number;
+  name: string;
+  rating?: number;
+  pickupLocation?: string;
+  cost?: string;
+  rated?: boolean;
+  triprated?: number;
+};
 
 const PassengerCarousel: React.FC<{
   passengers: Passenger[];
@@ -413,24 +405,24 @@ const PassengerCarousel: React.FC<{
         </div>
 
         <div className="sheet-details-card passenger-details">
-          <DetailRow label="Pick Up" value={p.pickupLocation}/>
-          <DetailRow label="Cost"    value={p.cost} valueClass="detail-price"/>
+          <DetailRow label="Pick Up" value={p.pickupLocation} />
+          <DetailRow label="Cost" value={p.cost} valueClass="detail-price" />
           {isPast && p.rated && (
-            <DetailRow label="Trip Rating" value={`⭐ ${p.triprated}`} valueClass="passenger-rating"/>
+            <DetailRow label="Trip Rating" value={`⭐ ${p.triprated}`} valueClass="passenger-rating" />
           )}
         </div>
 
         <div className="passenger-actions">
-          <Btn cls="btn-message" icon={Icons.message} label="Message" small/>
+          <Btn cls="btn-message" icon={Icons.message} label="Message" small />
           {isPast ? (
             <>
               {!p.rated && (
-                <Btn cls="btn-rate" icon={Icons.star} label="Rate" small onClick={() => onRatePassenger?.(p)}/>
+                <Btn cls="btn-rate" icon={Icons.star} label="Rate" small onClick={() => onRatePassenger?.(p)} />
               )}
 
             </>
           ) : (
-            <Btn cls="btn-cancel" icon={Icons.remove} label="Remove" small onClick={() => onRemovePassenger?.(p)}/>
+            <Btn cls="btn-cancel" icon={Icons.remove} label="Remove" small onClick={() => onRemovePassenger?.(p)} />
           )}
         </div>
       </div>
@@ -452,13 +444,40 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
   // Called when action is confirmed + success shown — dismiss modal then sheet
   const doneModal = () => { setModal(null); close(); };
 
+  const handleAction = async (type: 'accept' | 'deny', passengerId: number) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error("No token found");
+
+      // PUT /account/booking/bookings/{booking_id}/accept
+      // DELETE /account/booking/bookings/{booking_id}
+      const endpoint = type === 'accept'
+        ? `https://localhost:8000/account/booking/bookings/${passengerId}/accept`
+        : `https://localhost:8000/account/booking/bookings/${passengerId}`;
+
+      const response = await fetch(endpoint, {
+        method: type === 'accept' ? 'PUT' : 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) throw new Error(`${type === 'accept' ? 'Accept' : 'Deny'} failed`);
+
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
+
   const onTouchStart = (e: React.TouchEvent) => { touchStartY.current = e.touches[0].clientY; };
-  const onTouchEnd   = (e: React.TouchEvent) => {
+  const onTouchEnd = (e: React.TouchEvent) => {
     if (touchStartY.current !== null && e.changedTouches[0].clientY - touchStartY.current > 80) close();
     touchStartY.current = null;
   };
 
-  const passengers = getMockPassengers(trip.numberPassengers ?? 1);
+  const passengers = trip.passengers || [];
 
   const renderBody = () => {
     switch (trip.status) {
@@ -469,18 +488,20 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
           <>
             {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
-              <DetailRow label="Driver"         value={trip.drivername ?? 'Pending'}/>
-              <DetailRow label="Destination"    value={trip.destination ?? '—'}/>
-              <DetailRow label="Date & Arrival" value={trip.time ?? '—'}/>
-              <DetailRow label="Estimated leave" value="Pending"/>
-              <DetailRow label="Cost"           value={trip.price ?? '—'} valueClass="detail-price"/>
+              <DetailRow label="Driver" value={trip.drivername ?? 'Pending'} />
+              <DetailRow label="Destination" value={trip.destination ?? '—'} />
+              <DetailRow label="Date & Arrival" value={trip.time ?? '—'} />
+              <DetailRow label="Estimated leave" value="Pending" />
+              <DetailRow label="Cost" value={trip.price ?? '—'} valueClass="detail-price" />
             </div>
             <div className="sheet-actions">
-              <Btn cls="btn-message" icon={Icons.message} label="Message Driver"/>
-              <Btn cls="btn-cancel"  icon={Icons.cancel}  label="Cancel Trip"
-                onClick={() => openModal({ type: 'cancel',
+              <Btn cls="btn-message" icon={Icons.message} label="Message Driver" />
+              <Btn cls="btn-cancel" icon={Icons.cancel} label="Cancel Trip"
+                onClick={() => openModal({
+                  type: 'cancel',
                   title: 'Cancel this trip?',
-                  body: 'Are you sure you want to cancel your upcoming trip? The driver will be notified.' })}/>
+                  body: 'Are you sure you want to cancel your upcoming trip? The driver will be notified.'
+                })} />
             </div>
           </>
         );
@@ -491,17 +512,19 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
           <>
             {/* <RouteRow destination={trip.destination ?? 'Destination'}/> */}
             <div className="sheet-details-card">
-              <DetailRow label="Driver"      value={trip.drivername ?? 'Pending'}/>
-              <DetailRow label="Destination" value={trip.destination ?? '—'}/>
-              <DetailRow label="Be There For" value={trip.time ?? '—'}/>
-              <DetailRow label="Cost"        value={trip.price ?? '—'} valueClass="detail-price"/>
+              <DetailRow label="Driver" value={trip.drivername ?? 'Pending'} />
+              <DetailRow label="Destination" value={trip.destination ?? '—'} />
+              <DetailRow label="Be There For" value={trip.time ?? '—'} />
+              <DetailRow label="Cost" value={trip.price ?? '—'} valueClass="detail-price" />
             </div>
             <div className="sheet-actions">
-              <Btn cls="btn-message" icon={Icons.message} label="Message Driver"/>
-              <Btn cls="btn-cancel"  icon={Icons.cancel}  label="Cancel Trip"
-                onClick={() => openModal({ type: 'cancel',
+              <Btn cls="btn-message" icon={Icons.message} label="Message Driver" />
+              <Btn cls="btn-cancel" icon={Icons.cancel} label="Cancel Trip"
+                onClick={() => openModal({
+                  type: 'cancel',
                   title: 'Cancel this request?',
-                  body: 'Are you sure you want to cancel your trip request? The driver will be notified.' })}/>
+                  body: 'Are you sure you want to cancel your trip request? The driver will be notified.'
+                })} />
             </div>
           </>
         );
@@ -511,24 +534,26 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
         return (
           <>
             <div className="sheet-details-card">
-              <DetailRow label="Driver"       value={trip.drivername ?? '—'}/>
-              <DetailRow label="Destination"  value={trip.destination ?? '—'}/>
-              <DetailRow label="Pick Up Time" value={trip.time ?? '—'}/>
-              <DetailRow label="Arrival Time" value="09:45"/>
-              <DetailRow label="Cost"         value={trip.price ?? '—'} valueClass="detail-price"/>
+              <DetailRow label="Driver" value={trip.drivername ?? '—'} />
+              <DetailRow label="Destination" value={trip.destination ?? '—'} />
+              <DetailRow label="Pick Up Time" value={trip.time ?? '—'} />
+              <DetailRow label="Arrival Time" value="09:45" />
+              <DetailRow label="Cost" value={trip.price ?? '—'} valueClass="detail-price" />
               {trip.rating !== undefined && (
-                <DetailRow label="Your Rating" value={`⭐ ${trip.rating}`}/>
+                <DetailRow label="Your Rating" value={`⭐ ${trip.rating}`} />
               )}
             </div>
             <div className="sheet-actions">
-              <Btn cls="btn-message" icon={Icons.message} label="Message Driver"/>
+              <Btn cls="btn-message" icon={Icons.message} label="Message Driver" />
               {trip.rating === undefined && (
                 <Btn cls="btn-rate" icon={Icons.star} label="Rate Trip"
-                  onClick={() => openModal({ type: 'rating',
-                    target: { name: trip.drivername ?? 'Your Driver', role: 'driver' } })}/>
+                  onClick={() => openModal({
+                    type: 'rating',
+                    target: { name: trip.drivername ?? 'Your Driver', role: 'driver' }
+                  })} />
               )}
               <Btn cls="btn-report" icon={Icons.report} label="Report Issue"
-                onClick={() => openModal({ type: 'report' })}/>
+                onClick={() => openModal({ type: 'report' })} />
             </div>
           </>
         );
@@ -538,9 +563,9 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
         return (
           <>
             <div className="sheet-details-card">
-              <DetailRow label="Destination"  value={trip.destination ?? '—'}/>
-              <DetailRow label="Departure"    value={trip.time ?? '—'}/>
-              <DetailRow label="Est. Arrival" value="~09:45"/>
+              <DetailRow label="Destination" value={trip.destination ?? '—'} />
+              <DetailRow label="Departure" value={trip.time ?? '—'} />
+              <DetailRow label="Est. Arrival" value="~09:45" />
             </div>
             <div className="passenger-section-label">
               Passengers <span className="passenger-count-badge">{passengers.length}</span>
@@ -552,16 +577,20 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
             />
             <div className="sheet-actions" style={{ marginTop: 12 }}>
               <Btn cls="btn-cancel" icon={Icons.cancel} label="Cancel Whole Trip"
-                onClick={() => openModal({ type: 'cancel',
+                onClick={() => openModal({
+                  type: 'cancel',
                   title: 'Cancel whole trip?',
-                  body: 'This will cancel your trip for all passengers. Everyone will be notified.' })}/>
+                  body: 'This will cancel your trip for all passengers. Everyone will be notified.'
+                })} />
             </div>
             <div className="sheet-actions" style={{ marginTop: 12 }}>
               {/* Backend required here to move upcoming into active */}
-              <Btn cls="btn-accept"  icon={Icons.accept}  label="Begin Ride"
-                  onClick={() => openModal({ type: 'start',
+              <Btn cls="btn-accept" icon={Icons.accept} label="Begin Ride"
+                onClick={() => openModal({
+                  type: 'start',
                   title: 'Start whole trip?',
-                  body: 'This will start your trip and notify users.' })}/>
+                  body: 'This will start your trip and notify users.'
+                })} />
             </div>
           </>
         );
@@ -571,20 +600,20 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
         return (
           <>
             <div className="sheet-details-card">
-              <DetailRow label="Passenger"   value={trip.username ?? '—'}/>
+              <DetailRow label="Passenger" value={trip.username ?? '—'} />
               {trip.rating !== undefined && (
-                <DetailRow label="Rating"    value={`⭐ ${trip.rating}`}/>
+                <DetailRow label="Rating" value={`⭐ ${trip.rating}`} />
               )}
-              <DetailRow label="Destination" value={trip.destination ?? '—'}/>
-              <DetailRow label="Drop Off By" value={trip.time ?? '—'}/>
-              <DetailRow label="Cost"        value={trip.price ?? '—'} valueClass="detail-price"/>
+              <DetailRow label="Destination" value={trip.destination ?? '—'} />
+              <DetailRow label="Drop Off By" value={trip.time ?? '—'} />
+              <DetailRow label="Cost" value={trip.price ?? '—'} valueClass="detail-price" />
             </div>
             <div className="sheet-actions">
-              <Btn cls="btn-message" icon={Icons.message} label="Message Passenger"/>
-              <Btn cls="btn-accept"  icon={Icons.accept}  label="Accept Request"
-                onClick={() => openModal({ type: 'accept', passengerName: trip.username ?? 'Passenger' })}/>
-              <Btn cls="btn-cancel"  icon={Icons.cancel}  label="Deny Request"
-                onClick={() => openModal({ type: 'deny', passengerName: trip.username ?? 'Passenger' })}/>
+              <Btn cls="btn-message" icon={Icons.message} label="Message Passenger" />
+              <Btn cls="btn-accept" icon={Icons.accept} label="Accept Request"
+                onClick={() => openModal({ type: 'accept', passengerName: trip.username ?? 'Passenger' })} />
+              <Btn cls="btn-cancel" icon={Icons.cancel} label="Deny Request"
+                onClick={() => openModal({ type: 'deny', passengerName: trip.username ?? 'Passenger' })} />
             </div>
           </>
         );
@@ -594,9 +623,9 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
         return (
           <>
             <div className="sheet-details-card">
-              <DetailRow label="Destination" value={trip.destination ?? '—'}/>
-              <DetailRow label="Departure"   value={trip.time ?? '—'}/>
-              <DetailRow label="Arrival"     value="~09:45"/>
+              <DetailRow label="Destination" value={trip.destination ?? '—'} />
+              <DetailRow label="Departure" value={trip.time ?? '—'} />
+              <DetailRow label="Arrival" value="~09:45" />
             </div>
             <div className="passenger-section-label">
               Passengers <span className="passenger-count-badge">{passengers.length}</span>
@@ -608,7 +637,7 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
             />
             <div className="sheet-actions" style={{ marginTop: 12 }}>
               <Btn cls="btn-report" icon={Icons.report} label="Report Issue"
-                onClick={() => openModal({ type: 'report' })}/>
+                onClick={() => openModal({ type: 'report' })} />
             </div>
           </>
         );
@@ -619,27 +648,49 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
 
   return (
     <>
-      <div className={`sheet-overlay${closing ? ' overlay-closing' : ''}`} onClick={close}/>
+      <div className={`sheet-overlay${closing ? ' overlay-closing' : ''}`} onClick={close} />
       <div
         className={`trip-sheet${closing ? ' sheet-closing' : ''}`}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <div className="sheet-handle-area"><div className="sheet-handle"/></div>
+        <div className="sheet-handle-area"><div className="sheet-handle" /></div>
         <div className="sheet-scroll">
           <div className="sheet-header">
             <button className="sheet-back-btn" onClick={close}>{Icons.back} Back</button>
             <h2 className="sheet-title">Trip Details</h2>
-            <div style={{ width: 60 }}/>
+            <div style={{ width: 60 }} />
           </div>
-          <MapPlaceholder/>
+
+          {trip.ride_id ? (
+            <RideRenderMap
+              rideId={trip.ride_id}
+              height="300px"
+              interactive={true}
+              existingPickup={trip.pickup_lat && trip.pickup_lng ? { lat: trip.pickup_lat, lng: trip.pickup_lng } : undefined}
+            />
+          ) : (
+            <MapPlaceholder />
+          )}
+
           {renderBody()}
-          <div style={{ height: 32 }}/>
+          <div style={{ height: 32 }} />
         </div>
       </div>
 
       {modal && (
-        <Modal state={modal} onClose={closeModal} onDone={doneModal}/>
+        <Modal
+          state={modal}
+          onClose={closeModal}
+          onDone={doneModal}
+          onConfirmAction={async () => {
+            if (modal.type === 'accept' || modal.type === 'deny') {
+              const success = await handleAction(modal.type, trip.id);
+              return success;
+            }
+            return true;
+          }}
+        />
       )}
     </>
   );
@@ -698,7 +749,7 @@ const TripSection: React.FC<TripSectionProps> = ({
                     <div className="trip-row-title">{trip.destination ?? trip.username ?? 'Trip'}</div>
                     <div className="trip-row-meta">{trip.time}</div>
                     {trip.drivername && <div className="trip-row-meta">{trip.drivername}</div>}
-                    {trip.username   && <div className="trip-row-meta">{trip.username}</div>}
+                    {trip.username && <div className="trip-row-meta">{trip.username}</div>}
                     {trip.numberPassengers !== undefined && <div className="trip-row-meta">Passengers: {trip.numberPassengers}</div>}
                     <div className="trip-row-price">
                       {trip.price}
@@ -742,36 +793,151 @@ const ActivityPage: React.FC = () => {
   const [mode, setMode] = useState<'user' | 'Driver'>('user');
   const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
 
+  const [bookings, setBookings] = useState<Trip[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchActivity = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) throw new Error("No token found");
+
+      if (mode === 'user') {
+        const response = await fetch('https://localhost:8000/account/booking/bookings/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Failed to fetch rider activity");
+        const data = await response.json();
+
+        const transformed: Trip[] = data.map((b: any) => ({
+          id: b.id,
+          ride_id: b.ride_id,
+          username: b.ride?.driver?.first_name ? `${b.ride.driver.first_name} ${b.ride.driver.last_name}` :
+            b.passenger_name || `User ${b.user_id?.substring(0, 4)}`,
+          destination: b.dropoff_location || b.ride?.destination || 'Destination',
+          time: b.pickup_time || b.ride?.departure_time || 'Pending',
+          price: `£${b.price || '0.00'}`,
+          status: b.status === 'pending' ? 'requested' :
+            b.status === 'confirmed' ? 'upcomingUser' :
+              b.status === 'completed' ? 'pastUser' : 'cancelled', // Default to cancelled if not matched
+          action: 'More',
+          pickup_lat: b.pickup_lat,
+          pickup_lng: b.pickup_lng
+        })).filter((t: Trip) => t.status !== 'cancelled');
+        setBookings(transformed);
+      } else {
+        const response = await fetch('https://localhost:8000/account/rides/rides/driver/dashboard', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error("Failed to fetch driver dashboard");
+        const ridesData = await response.json();
+
+        const finalDriverActivities: Trip[] = [];
+        ridesData.forEach((ride: any) => {
+          // 1. Add the ride itself (for upcoming/past)
+          finalDriverActivities.push({
+            id: ride.id,
+            ride_id: ride.id,
+            destination: ride.destination,
+            time: ride.departure_time,
+            status: ride.status === 'completed' ? 'pastDriver' : 'upcomingDriver',
+            action: 'More',
+            numberPassengers: ride.seats_total - ride.seats_available,
+            passengers: ride.bookings
+              .filter((b: any) => b.status === 'confirmed')
+              .map((b: any) => ({
+                id: b.id,
+                name: b.passenger ? `${b.passenger.first_name} ${b.passenger.last_name}` : 'Unknown',
+                rating: b.passenger?.rider_rating,
+                pickupLocation: b.pickup_location,
+                cost: `£${b.price}`,
+                rated: false // Placeholder for now
+              }))
+          });
+
+          // 2. Add each pending booking (for requests)
+          ride.bookings.forEach((b: any) => {
+            if (b.status === 'pending') {
+              finalDriverActivities.push({
+                id: b.id,
+                ride_id: ride.id,
+                username: b.passenger ? `${b.passenger.first_name} ${b.passenger.last_name}` : 'Unknown Passenger',
+                destination: b.dropoff_location,
+                time: b.pickup_time || ride.departure_time,
+                price: `£${b.price}`,
+                status: 'passengerRequest',
+                action: 'More',
+                pickup_lat: b.pickup_lat,
+                pickup_lng: b.pickup_lng
+              });
+            }
+          });
+        });
+        setBookings(finalDriverActivities);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchActivity();
+  }, [mode]);
+
+  // Filter combined activity based on role and status
+  const driverRequests = bookings.filter(b => b.status === 'passengerRequest');
+  const driverUpcoming = bookings.filter(b => b.status === 'upcomingDriver');
+  const driverPast = bookings.filter(b => b.status === 'pastDriver');
+
+  const riderUpcoming = bookings.filter(b => b.status === 'upcomingUser');
+  const riderRequested = bookings.filter(b => b.status === 'requested');
+  const riderPast = bookings.filter(b => b.status === 'pastUser');
+
   return (
     <>
       <header className="uber-header">
         <h1 className="activity-title">Activity</h1>
         <div className="top-toggle">
-          <button className={`toggle-tab ${mode === 'user'   ? 'toggle-tab-active' : ''}`} onClick={() => setMode('user')}>Rider</button>
+          <button className={`toggle-tab ${mode === 'user' ? 'toggle-tab-active' : ''}`} onClick={() => setMode('user')}>Rider</button>
           <button className={`toggle-tab ${mode === 'Driver' ? 'toggle-tab-active' : ''}`} onClick={() => setMode('Driver')}>Driver</button>
         </div>
       </header>
 
-      <TripSection title="Upcoming" trips={mode === 'user' ? upcomingTripsUser : upcomingTripsDriver}
-        emptyTitle="You have no upcoming trips" emptySubtitle="Reserve your trip →" emptyIcon="📅"
-        collapsible mode={mode} onTripMore={setSelectedTrip}/>
+      {loading && <p style={{ padding: '20px' }}>Loading activities...</p>}
+      {error && <p style={{ padding: '20px', color: '#f87171' }}>Error: {error}</p>}
 
-      {mode === 'user' ? (
-        <TripSection title="Requested" trips={requestedTrips}
-          emptyTitle="You have no requested trips" emptySubtitle="Book a reservation →" emptyIcon="🗓️"
-          collapsible mode={mode} onTripMore={setSelectedTrip}/>
-      ) : (
-        <TripSection title="Passenger Requests" trips={passengerRequestedTrips}
-          emptyTitle="You have no requests" emptySubtitle="Post a trip →" emptyIcon="🗓️"
-          collapsible mode={mode} onTripMore={setSelectedTrip} showFilter/>
+      {!loading && (
+        <>
+          <TripSection title="Upcoming" trips={mode === 'user' ? riderUpcoming : driverUpcoming}
+            emptyTitle="You have no upcoming trips" emptySubtitle="Reserve your trip →" emptyIcon="📅"
+            collapsible mode={mode} onTripMore={setSelectedTrip} />
+
+          {mode === 'user' ? (
+            <TripSection title="Requested" trips={riderRequested}
+              emptyTitle="You have no requested trips" emptySubtitle="Book a reservation →" emptyIcon="🗓️"
+              collapsible mode={mode} onTripMore={setSelectedTrip} />
+          ) : (
+            <TripSection title="Passenger Requests" trips={driverRequests}
+              emptyTitle="You have no requests" emptySubtitle="Soon your ride will be booked" emptyIcon="🗓️"
+              collapsible mode={mode} onTripMore={setSelectedTrip} showFilter />
+          )}
+
+          <TripSection title="Past" trips={mode === 'user' ? riderPast : driverPast}
+            emptyTitle="No past trips yet" emptySubtitle="Your completed rides will appear here" emptyIcon="🕘"
+            collapsible mode={mode} onTripMore={setSelectedTrip} />
+        </>
       )}
 
-      <TripSection title="Past" trips={mode === 'user' ? pastTripsUsers : pastTripsDrivers}
-        emptyTitle="No past trips yet" emptySubtitle="Your completed rides will appear here" emptyIcon="🕘"
-        collapsible mode={mode} onTripMore={setSelectedTrip}/>
-
       {selectedTrip && (
-        <TripDetailsPanel trip={selectedTrip} mode={mode} onClose={() => setSelectedTrip(null)}/>
+        <TripDetailsPanel trip={selectedTrip} mode={mode} onClose={() => {
+          setSelectedTrip(null);
+          fetchActivity(); // Refresh after potentially accepting/denying
+        }} />
       )}
     </>
   );
