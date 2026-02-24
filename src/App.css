@@ -340,6 +340,35 @@ body {
   font-size: 28px;
 }
 
+/* Driver badge - matches safety progress styling */
+.driver-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.driver-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover effect */
+.info-card:hover .driver-badge {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+
 /* Safety progress + CO2 */
 
 .safety-progress-ring {

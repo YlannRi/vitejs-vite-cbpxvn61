@@ -54,7 +54,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
       if (!token) return;
 
       try {
-        const response = await fetch('https://localhost:8000/account/users/users/me', {
+        const response = await fetch('https://localhost:8000/users/me', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -96,7 +96,7 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
 
     if (token) {
       try {
-        await fetch('https://localhost:8000/account/auth/auth/logout', {
+        await fetch('https://localhost:8000/auth/logout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -130,8 +130,18 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
         title="Your timetable"
         subtitle="See and manage your upcoming rides for uni."
         right={<span className="info-card-emoji">📅</span>}
-      />
+          />
 
+      <InfoCard
+
+        title="Become a Driver"
+        subtitle="Earn money by offering rides to classmates."
+        right={
+            <div className="driver-status">
+                <span className="driver-badge">🚗</span>
+            </div>
+        }
+        />
       <InfoCard
         title="Safety check-up"
         subtitle="Learn ways to make rides safer."
@@ -140,7 +150,8 @@ const AccountPage: React.FC<AccountPageProps> = ({ onLogout }) => {
             <span className="safety-progress-ring">1/6</span>
           </div>
         }
-      />
+          />
+
     </>
   );
 };

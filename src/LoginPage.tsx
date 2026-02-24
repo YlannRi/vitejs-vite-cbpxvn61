@@ -22,8 +22,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onAuthSuccess }) => {
     setLoading(true);
 
     const endpoint = mode === 'login'
-      ? 'https://localhost:8000/account/auth/auth/login'
-      : 'https://localhost:8000/account/auth/auth/register';
+      ? 'https://localhost:8000/auth/login'
+      : 'https://localhost:8000/auth/register';
 
     // Both Login and Register now send standard JSON
     const payload = mode === 'login'
@@ -57,18 +57,20 @@ const LoginPage: React.FC<LoginPageProps> = ({ onAuthSuccess }) => {
 
       const data = await response.json();
 
-      // Look for access_token based on your backend return statement
-      const token = data.access_token || data.token;
+  
 
-      if (token) {
-        localStorage.setItem('authToken', token);
-      } else if (mode === 'login') {
-        throw new Error("Login succeeded but no token was returned from the server.");
-      }
-
-      if (onAuthSuccess) {
-        onAuthSuccess();
-      }
+    if (data.access_token) {
+        localStorage.setItem('authToken', data.access_token);
+        if (onAuthSuccess) onAuthSuccess();
+    } else {
+    
+        setError(null);
+        setEmail('');
+        setPassword('');
+        setName('');
+        alert(data.message || "Registration successful! Please check your email to verify and log in.");
+        setMode('login');
+    }
     } catch (err: any) {
       console.error("Auth error:", err);
       setError(err.message);

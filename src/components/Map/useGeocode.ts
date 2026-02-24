@@ -18,7 +18,7 @@ export const useGeocode = () => {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`https://localhost:8000/routing/routing/geocode?q=${encodeURIComponent(address)}`, {
+            const response = await fetch(`https://localhost:8000/routing/geocode?q=${encodeURIComponent(address)}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

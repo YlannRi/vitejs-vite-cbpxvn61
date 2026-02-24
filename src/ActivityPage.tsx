@@ -452,8 +452,8 @@ const TripDetailsPanel: React.FC<{ trip: Trip; mode: 'user' | 'Driver'; onClose:
       // PUT /account/booking/bookings/{booking_id}/accept
       // DELETE /account/booking/bookings/{booking_id}
       const endpoint = type === 'accept'
-        ? `https://localhost:8000/account/booking/bookings/${passengerId}/accept`
-        : `https://localhost:8000/account/booking/bookings/${passengerId}`;
+        ? `https://localhost:8000/bookings/${passengerId}/accept`
+        : `https://localhost:8000/bookings/${passengerId}`;
 
       const response = await fetch(endpoint, {
         method: type === 'accept' ? 'PUT' : 'DELETE',
@@ -805,7 +805,7 @@ const ActivityPage: React.FC = () => {
       if (!token) throw new Error("No token found");
 
       if (mode === 'user') {
-        const response = await fetch('https://localhost:8000/account/booking/bookings/me', {
+        const response = await fetch('https://localhost:8000/bookings/me', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) throw new Error("Failed to fetch rider activity");
@@ -828,7 +828,7 @@ const ActivityPage: React.FC = () => {
         })).filter((t: Trip) => t.status !== 'cancelled');
         setBookings(transformed);
       } else {
-        const response = await fetch('https://localhost:8000/account/rides/rides/driver/dashboard', {
+        const response = await fetch('https://localhost:8000/rides/driver/dashboard', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) throw new Error("Failed to fetch driver dashboard");

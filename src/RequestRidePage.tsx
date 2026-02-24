@@ -46,7 +46,7 @@ const RequestRidePage: React.FC = () => {
       }
 
       // MAKE THE AUTHORIZED REQUEST
-      const response = await fetch('https://localhost:8000/account/rides/rides/', {
+      const response = await fetch('https://localhost:8000/rides/', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const RequestRidePage: React.FC = () => {
         params.append('pickup_lng', pickupCoords.lng.toString());
       }
 
-      const response = await fetch(`https://localhost:8000/account/booking/bookings/?${params.toString()}`, {
+      const response = await fetch(`https://localhost:8000/bookings/?${params.toString()}`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

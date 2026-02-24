@@ -35,7 +35,7 @@ export const RideRenderMap: React.FC<RideRenderMapProps> = ({
                 const token = localStorage.getItem('authToken');
 
                 // Fetch the GeoJSON route from our routing backend
-                const response = await fetch(`https://localhost:8000/routing/routing/ride/${rideId}`, {
+                const response = await fetch(`https://localhost:8000/routing/ride/${rideId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
